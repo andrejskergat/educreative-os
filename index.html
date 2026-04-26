@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocialFin Creative OS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0a0a16;
+    --bg2:      #0d0d1e;
+    --bg3:      #111128;
+    --border:   #1e1e36;
+    --border2:  #2a2a4a;
+    --text:     #ccccee;
+    --muted:    #555577;
+    --dim:      #333355;
+    --purple:   #7b61ff;
+    --gold:     #ffb400;
+    --green:    #00c896;
+    --red:      #ff4d4d;
+    --orange:   #f5a623;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', 'Courier New', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── APP SHELL ── */
+  #app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  #top-nav {
+    background: linear-gradient(135deg, #0d0d20 0%, #0a0a16 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .nav-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px 24px 16px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 20px;
+  }
+  .nav-brand-sub { font-size: 9px; color: #444466; letter-spacing: 3px; margin-bottom: 4px; }
+  .nav-brand-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #fff; }
+  .nav-brand-title span { color: var(--purple); }
+
+  .nav-tab {
+    background: none;
+    border: none;
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+  }
+  .nav-tab:hover { color: var(--muted); }
+  .nav-tab.active { color: #fff; border-bottom-color: var(--purple); }
+  .nav-tab.active-gold { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── PANELS ── */
+  .panel { display: none; flex: 1; overflow: hidden; }
+  .panel.visible { display: flex; flex-direction: column; }
+
+  /* ════════════════════════════════════════
+     COPY WRITER PANEL
+  ════════════════════════════════════════ */
+  #cw-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Left sidebar */
+  #cw-sidebar {
+    width: 270px;
+    min-width: 270px;
+    border-right: 1px solid var(--border);
+    background: #0c0c1a;
+    overflow-y: auto;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .label {
+    font-size: 9px;
+    color: #444466;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  select, input {
+    background: #141420;
+    color: var(--text);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+  }
+  select:focus, input:focus { border-color: var(--purple); }
+
+  .angle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 11px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+    transition: all 0.12s;
+    letter-spacing: 0.3px;
+  }
+  .angle-btn:hover { border-color: var(--border2); color: var(--text); }
+  .angle-btn.active {
+    background: rgba(255,180,0,0.1);
+    border-color: rgba(255,180,0,0.35);
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* Voice profile card */
+  .profile-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .profile-row { margin-bottom: 9px; }
+  .profile-row .label { margin-bottom: 2px; }
+  .profile-val { font-size: 10px; color: #8888aa; line-height: 1.55; }
+  .voice-warning {
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(255,180,0,0.05);
+    border: 1px solid rgba(255,180,0,0.18);
+    border-radius: 5px;
+    font-size: 10px;
+    color: #887744;
+    line-height: 1.55;
+  }
+
+  /* Right content */
+  #cw-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+
+  .format-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 22px;
+  }
+  .format-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .format-tab.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #0a0a16;
+    font-weight: 700;
+  }
+
+  .formula-section { margin-bottom: 22px; }
+  .formula-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .section-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+
+  .formula-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 15px;
+    cursor: pointer;
+    margin-bottom: 7px;
+    transition: all 0.13s;
+    font-size: 11px;
+    color: #7777aa;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .formula-card:hover { border-color: var(--border2); color: var(--muted); }
+  .formula-card.selected {
+    background: rgba(123,97,255,0.09);
+    border-color: rgba(123,97,255,0.45);
+    color: #d0ccff;
+  }
+  .formula-card.selected::after {
+    content: '';
+    position: absolute;
+    top: 11px; right: 11px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--purple);
+  }
+
+  .selected-preview {
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+  .selected-preview .highlight { color: var(--purple); }
+
+  .copy-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-family: inherit;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .copy-btn.copied {
+    background: rgba(0,200,150,0.15);
+    border-color: rgba(0,200,150,0.4);
+    color: var(--green);
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .info-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+  .info-box.gold {
+    background: rgba(255,180,0,0.04);
+    border-color: rgba(255,180,0,0.15);
+  }
+  .info-box .label { margin-bottom: 9px; }
+  .info-box p {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .info-box.gold p { color: #887744; }
+  .tag {
+    display: inline-block;
+    background: rgba(255,180,0,0.12);
+    color: var(--gold);
+    border: 1px solid rgba(255,180,0,0.25);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 9px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ════════════════════════════════════════
+     CREATIVE OS PANEL
+  ════════════════════════════════════════ */
+  #cos-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Sub-tabs */
+  #cos-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 0 28px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .cos-tab {
+    background: none;
+    border: none;
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .cos-tab:hover { color: var(--muted); }
+  .cos-tab.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
+
+  #cos-content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+  /* Brief table */
+  .brief-controls {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .ctrl-group { display: flex; flex-direction: column; }
+  .ctrl-group select, .ctrl-group input { min-width: 160px; }
+  .stat-pill {
+    background: rgba(123,97,255,0.1);
+    border: 1px solid rgba(123,97,255,0.3);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    align-self: flex-end;
+  }
+
+  .rule-box {
+    background: rgba(123,97,255,0.06);
+    border: 1px solid rgba(123,97,255,0.14);
+    border-radius: 8px;
+    padding: 11px 15px;
+    margin-bottom: 18px;
+    font-size: 11px;
+    color: #8888bb;
+    line-height: 1.6;
+  }
+  .rule-box strong { color: var(--purple); }
+
+  .brief-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
+  th {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    text-transform: uppercase;
+    text-align: left;
+    padding: 0 8px 8px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  td {
+    padding: 8px 7px;
+    background: var(--bg3);
+    border-top: 1px solid #1a1a33;
+    border-bottom: 1px solid #1a1a33;
+    font-size: 11px;
+    color: #aaaacc;
+    vertical-align: middle;
+  }
+  td:first-child { border-left: 1px solid #1a1a33; border-radius: 6px 0 0 6px; }
+  td:last-child  { border-right: 1px solid #1a1a33; border-radius: 0 6px 6px 0; }
+  td select, td input { border-radius: 5px; padding: 5px 8px; font-size: 11px; }
+
+  .row-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .row-num.staple { background: rgba(123,97,255,0.12); border: 1px solid rgba(123,97,255,0.2); color: var(--purple); }
+  .row-num.homerun { background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3); color: var(--orange); }
+
+  .del-btn {
+    background: none; border: none; color: var(--border2);
+    cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 5px;
+    transition: color 0.12s;
+  }
+  .del-btn:hover { color: var(--red); }
+
+  .track-select-staple { color: var(--green) !important; border-color: rgba(0,200,150,0.3) !important; }
+  .track-select-homerun { color: var(--orange) !important; border-color: rgba(245,166,35,0.4) !important; }
+
+  .btn {
+    background: transparent;
+    border: 1px dashed var(--border2);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.12s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--purple); }
+  .btn.primary {
+    background: rgba(123,97,255,0.14);
+    border: 1px solid rgba(123,97,255,0.4);
+    border-style: solid;
+    color: var(--purple);
+    font-weight: 700;
+  }
+  .btn.primary:hover { background: rgba(123,97,255,0.22); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+
+  /* Log & Tracker add forms */
+  .add-form {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+  .add-form-title { font-size: 10px; color: #5555aa; letter-spacing: 2px; margin-bottom: 13px; }
+  .add-form-fields { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .add-form-fields .ctrl-group { flex: 1 1 130px; }
+  .add-form-fields .ctrl-group.wide { flex: 2 1 200px; }
+  .add-form-fields .ctrl-group select,
+  .add-form-fields .ctrl-group input { min-width: unset; }
+
+  .add-btn {
+    background: var(--purple);
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: inherit;
+    letter-spacing: 1px;
+    font-weight: 700;
+    cursor: pointer;
+    align-self: flex-end;
+    white-space: nowrap;
+    transition: opacity 0.12s;
+  }
+  .add-btn:hover { opacity: 0.85; }
+
+  /* Track badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .badge.staple { background: rgba(0,200,150,0.12); color: var(--green); border: 1px solid rgba(0,200,150,0.25); }
+  .badge.homerun { background: rgba(245,166,35,0.15); color: var(--orange); border: 1px solid rgba(245,166,35,0.3); }
+
+  /* Status select colours */
+  .status-running { color: var(--orange) !important; }
+  .status-winner  { color: var(--green)  !important; }
+  .status-retired { color: var(--red)    !important; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--border2);
+    padding: 50px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #222244; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="app-shell">
+
+  <!-- TOP NAV -->
+  <nav id="top-nav">
+    <div class="nav-brand">
+      <div class="nav-brand-sub">SocialFin Digital</div>
+      <div class="nav-brand-title">Creative <span>OS</span></div>
+    </div>
+    <button class="nav-tab active" data-panel="copy-writer" onclick="switchPanel('copy-writer')">Copy Writer</button>
+    <button class="nav-tab" data-panel="creative-os" onclick="switchPanel('creative-os')">Weekly Brief &amp; Tracker</button>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       COPY WRITER PANEL
+  ══════════════════════════════════════════ -->
+  <div class="panel visible" id="panel-copy-writer">
+    <div id="cw-body">
+
+      <!-- Sidebar -->
+      <div id="cw-sidebar">
+        <div>
+          <div class="label">Client</div>
+          <select id="cw-client" onchange="cwRender()"></select>
+        </div>
+        <div>
+          <div class="label">Angle</div>
+          <div id="cw-angles"></div>
+        </div>
+        <div>
+          <div class="label">Voice Profile</div>
+          <div class="profile-card" id="cw-profile"></div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div id="cw-content">
+        <div class="format-tabs" id="cw-format-tabs">
+          <button class="format-tab active" onclick="cwSetFormat(0)">Static Creative</button>
+          <button class="format-tab" onclick="cwSetFormat(1)">Meta Caption</button>
+          <button class="format-tab" onclick="cwSetFormat(2)">Video Script</button>
+        </div>
+        <div id="cw-formulas"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CREATIVE OS PANEL
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="panel-creative-os">
+    <div id="cos-body">
+      <div id="cos-tabs">
+        <button class="cos-tab active" onclick="cosSetTab('brief')">Weekly Brief</button>
+        <button class="cos-tab" onclick="cosSetTab('log')">Concept Log</button>
+        <button class="cos-tab" onclick="cosSetTab('tracker')">Performance Tracker</button>
+      </div>
+      <div id="cos-content"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════
+
+const CLIENT_PROFILES = {
+  "Little Oxford Schoolhouse": {
+    type: "Preschool",
+    tone: "Warm, conversational, parent-to-parent",
+    audience: "Parents of children aged 18mo–6yrs in Singapore",
+    offer: "Premium preschool education in a nurturing environment",
+    fearCore: "Missing the critical early learning window",
+    desireCore: "A child who is confident, curious and school-ready",
+    proofAssets: "200+ enrolled families, bilingual programme, qualified educators",
+    ctaOffer: "Book a school tour",
+    voiceNotes: "Speak like a trusted parent, not a school brochure. Warm but never fluffy.",
+  },
+  "MindChamps Allied Care": {
+    type: "Early Intervention",
+    tone: "Empathetic, emotionally driven, reassuring",
+    audience: "Parents of children aged 2–6 with developmental concerns",
+    offer: "Early intervention therapy in a caring, child-friendly setting",
+    fearCore: "Waiting too long and missing the intervention window",
+    desireCore: "Seeing their child reach milestones they feared might not happen",
+    proofAssets: "Allied health professionals, evidence-based methods, holistic approach",
+    ctaOffer: "Book a complimentary consultation",
+    voiceNotes: "Acknowledge the parent's emotional journey first. Never clinical. Continuity over features.",
+  },
+  "HEI Schools Bishan": {
+    type: "Premium Preschool — Finnish Method",
+    tone: "Aspirational, warm, quietly confident. Never salesy.",
+    audience: "Parents of children aged 18mo–6yrs in Singapore, upper-income, education-conscious",
+    offer: "Finnish-method preschool education founded by Jayne Nadarajoo, backed by University of Helsinki. Bishan campus at 11 Binchang Rise.",
+    fearCore: "Choosing the wrong school and holding their child back during the most critical years",
+    desireCore: "A child who genuinely loves learning — curious, joyful, and ready for school on their own terms",
+    proofAssets: "Co-founded by Prof Lasse Lipponen, University of Helsinki. Founded locally by Jayne Nadarajoo (White Lodge, Avondale Grammar, Melbourne International School).",
+    ctaOffer: "Book a school tour at Bishan",
+    voiceNotes: "⚠ JOY over fear — never lead with anxiety or urgency. The authority comes from Helsinki. Tone: a knowledgeable friend, not a marketer. Never write 'world-class' or 'holistic'. The Finnish angle IS the differentiator — name it specifically.",
+  },
+  "Client 3": {
+    type: "Enrichment / Tuition",
+    tone: "Direct, outcome-led, results-focused",
+    audience: "Parents of primary/secondary school children",
+    offer: "Academic enrichment and tuition programme",
+    fearCore: "Child falling behind peers or struggling with school",
+    desireCore: "Visible improvement in grades and confidence",
+    proofAssets: "Track record of grade improvements, experienced tutors",
+    ctaOffer: "Claim your free trial class",
+    voiceNotes: "Parents here want proof, not promises. Lead with results.",
+  },
+  "Client 4": {
+    type: "Enrichment / Tuition",
+    tone: "Direct, outcome-led, results-focused",
+    audience: "Parents of primary/secondary school children",
+    offer: "Academic enrichment and tuition programme",
+    fearCore: "Child falling behind peers or struggling with school",
+    desireCore: "Visible improvement in grades and confidence",
+    proofAssets: "Track record of grade improvements, experienced tutors",
+    ctaOffer: "Claim your free trial class",
+    voiceNotes: "Parents here want proof, not promises. Lead with results.",
+  },
+  "Client 5": {
+    type: "Preschool",
+    tone: "Warm, conversational, parent-to-parent",
+    audience: "Parents of children aged 18mo–6yrs",
+    offer: "Premium preschool education",
+    fearCore: "Missing the critical early learning window",
+    desireCore: "A child who is confident, curious and school-ready",
+    proofAssets: "Qualified educators, nurturing environment",
+    ctaOffer: "Book a school tour",
+    voiceNotes: "Speak like a trusted parent, not a school brochure.",
+  },
+  "Client 6": {
+    type: "Enrichment / Tuition",
+    tone: "Direct, outcome-led, results-focused",
+    audience: "Parents of primary/secondary school children",
+    offer: "Academic enrichment programme",
+    fearCore: "Child falling behind peers",
+    desireCore: "Grades and confidence improving",
+    proofAssets: "Experienced educators, structured programme",
+    ctaOffer: "Book a free trial",
+    voiceNotes: "Results-first tone. Short and punchy.",
+  },
+};
+
+const FORMULAS = {
+  "Outcome": {
+    headline: [
+      "What [CHILD] could be by [AGE/MILESTONE].",
+      "The [TIMEFRAME] that changes everything for [CHILD].",
+      "[RESULT] isn't luck. It's the right start.",
+      "Your child, [DESIRED OUTCOME]. Here's how.",
+    ],
+    body: [
+      "At [SCHOOL], we [HOW YOU DELIVER OUTCOME]. Not just during class — it carries home.",
+      "Every child has a window for [OUTCOME]. We help parents make the most of it.",
+      "[PROOF ASSET]. [RESULT] doesn't happen by accident.",
+    ],
+    caption: [
+      "Most parents don't realise how much the early years shape [OUTCOME]. At [SCHOOL], we build [QUALITY] from day one — in every class, every interaction, every routine.\n\n[PROOF ASSET].\n\n👉 [CTA OFFER] — link in bio.",
+      "The question isn't whether your child will get there. It's whether they'll get there with the right foundation.\n\n[SCHOOL] gives children [OUTCOME] through [HOW].\n\n[PROOF ASSET]. [CTA OFFER] →",
+    ],
+    script: [
+      "Hook: \"[DESIRED OUTCOME] — most parents think that just happens. It doesn't.\"\nBody: \"At [SCHOOL], [HOW YOU DELIVER]. [PROOF ASSET]. That's [RESULT].\"\nCTA: \"[CTA OFFER]. Link below.\"",
+    ],
+  },
+  "Fear/Gap": {
+    headline: [
+      "Most parents don't realise this until it's too late.",
+      "There's a window for [DEVELOPMENT AREA]. It closes at [AGE].",
+      "What happens if you wait another [TIMEFRAME]?",
+      "The sign most parents miss — and what to do about it.",
+    ],
+    body: [
+      "The [DEVELOPMENT AREA] window is smaller than most people think. After [AGE], it gets harder.",
+      "By the time [CONCERN SIGNAL], [CONSEQUENCE]. Most families wish they'd started sooner.",
+      "Not every school is built for [CHILD TYPE]. [SCHOOL] is.",
+    ],
+    caption: [
+      "A lot of parents come to us and say the same thing: \"I wish we'd started earlier.\"\n\nThe truth is, [DEVELOPMENT AREA] has a window. And [SCHOOL] is designed to help your child make the most of it — before that window narrows.\n\n[PROOF ASSET].\n\n👉 [CTA OFFER].",
+      "If you've noticed [CONCERN SIGNAL] — that's worth taking seriously.\n\n[SCHOOL] specialises in [HOW YOU HELP]. Early action makes a real difference.\n\n[CTA OFFER] — spots are limited.",
+    ],
+    script: [
+      "Hook: \"If your child is [AGE] and you've noticed [CONCERN SIGNAL] — this is important.\"\nBody: \"[DEVELOPMENT AREA] develops fastest between [AGE RANGE]. At [SCHOOL], we [HOW]. [PROOF ASSET].\"\nCTA: \"[CTA OFFER]. Don't wait — link below.\"",
+    ],
+  },
+  "Social Proof": {
+    headline: [
+      "Why [NUMBER]+ families chose [SCHOOL] this year.",
+      "\"[SHORT PARENT QUOTE]\" — [PARENT NAME/DESCRIPTION]",
+      "[NUMBER] children. One thing in common: [SCHOOL].",
+      "Here's what parents say after [TIMEFRAME] at [SCHOOL].",
+    ],
+    body: [
+      "\"[PARENT QUOTE].\" — [Parent of child, age X]",
+      "[NUMBER]+ families. [RESULT THEY SAW]. That's not marketing — that's what parents tell us.",
+      "When [PARENT CONCERN], they found [SCHOOL]. [RESULT].",
+    ],
+    caption: [
+      "\"[EXTENDED PARENT QUOTE].\"\n— [Parent name/description]\n\nThis is what we hear every week from families at [SCHOOL]. [PROOF ASSET].\n\n[CTA OFFER] — [link/DM us].",
+      "We let our parents do the talking.\n\n\"[PARENT QUOTE].\"\n\n[NUMBER]+ families have chosen [SCHOOL] for [REASON]. [CTA OFFER] to see if it's the right fit.",
+    ],
+    script: [
+      "Hook: \"This is what [PARENT DESCRIPTION] said after [TIMEFRAME] at [SCHOOL].\"\nBody: \"[PARENT QUOTE]. [NUMBER]+ families have experienced [RESULT].\"\nCTA: \"[CTA OFFER] — link below.\"",
+    ],
+  },
+  "Curiosity": {
+    headline: [
+      "What actually happens in the first 3 months at [SCHOOL]?",
+      "Why do children at [SCHOOL] [OBSERVABLE BEHAVIOUR]?",
+      "We've never told anyone this before.",
+      "This is what [CHILD TYPE] needs — and most schools skip it.",
+    ],
+    body: [
+      "Most people assume [COMMON BELIEF]. At [SCHOOL], we do it differently.",
+      "The answer surprised even us. [INTRIGUING FACT/APPROACH].",
+      "It starts with [UNEXPECTED THING]. And that changes everything.",
+    ],
+    caption: [
+      "Most parents ask us: what actually makes [SCHOOL] different?\n\nThe honest answer: [UNEXPECTED DIFFERENTIATOR].\n\nIt's not something you see in brochures. It's something you see in your child after [TIMEFRAME].\n\n[CTA OFFER] — come see for yourself.",
+      "Here's something we don't talk about enough.\n\n[INTRIGUING INSIGHT ABOUT APPROACH].\n\nThat's why children at [SCHOOL] [OBSERVABLE RESULT].\n\n[PROOF ASSET]. [CTA OFFER] →",
+    ],
+    script: [
+      "Hook: \"Most parents never ask this question — but they should.\"\nBody: \"[QUESTION]. At [SCHOOL], the answer is [UNEXPECTED APPROACH]. And here's what that looks like: [RESULT].\"\nCTA: \"[CTA OFFER]. Come see it yourself — link below.\"",
+    ],
+  },
+  "Transformation": {
+    headline: [
+      "Shy at [AGE]. Confident at [OLDER AGE]. Here's what changed.",
+      "[BEFORE STATE] to [AFTER STATE] — in [TIMEFRAME].",
+      "This is what [TIMEFRAME] at [SCHOOL] can look like.",
+      "You wouldn't recognise the same child [TIMEFRAME] later.",
+    ],
+    body: [
+      "When [CHILD/PARENT NAME] first came to us, [BEFORE STATE]. Today, [AFTER STATE].",
+      "The shift doesn't happen overnight. But it does happen. [HOW].",
+      "Before: [BEFORE]. After: [AFTER]. The difference: [SCHOOL].",
+    ],
+    caption: [
+      "[CHILD DESCRIPTION] came to [SCHOOL] [TIMEFRAME] ago. [BEFORE STATE].\n\nToday: [AFTER STATE].\n\nThat's not unusual here. It's what happens when [HOW YOU WORK].\n\n[PROOF ASSET]. [CTA OFFER] →",
+      "Some changes are hard to put into words.\n\nBut parents at [SCHOOL] try anyway.\n\n\"[TRANSFORMATION QUOTE].\"\n\n[CTA OFFER] to see what's possible for your child.",
+    ],
+    script: [
+      "Hook: \"[BEFORE STATE]. That was [CHILD] [TIMEFRAME] ago.\"\nBody: \"Today, [AFTER STATE]. At [SCHOOL], [HOW YOU ACHIEVE TRANSFORMATION]. [PROOF ASSET].\"\nCTA: \"[CTA OFFER] — link below.\"",
+    ],
+  },
+  "Specificity": {
+    headline: [
+      "Our [PROGRAMME NAME] runs every [DAY] at [TIME].",
+      "[NUMBER] spots left for [INTAKE PERIOD].",
+      "Open house: [DATE]. [NUMBER] families already registered.",
+      "[SPECIFIC OFFER] — only available until [DATE].",
+    ],
+    body: [
+      "[PROGRAMME NAME]: [SPECIFIC DETAIL 1], [SPECIFIC DETAIL 2], [SPECIFIC DETAIL 3].",
+      "Accepting enrolments for [INTAKE]. [NUMBER] places remaining.",
+      "[FEE/OFFER] for families who register before [DATE].",
+    ],
+    caption: [
+      "If you've been thinking about [SCHOOL] — now is the time.\n\n[SPECIFIC PROGRAMME OR INTAKE DETAILS]. [NUMBER] spots available for [INTAKE PERIOD].\n\n[PROOF ASSET].\n\n👉 [CTA OFFER] before [DEADLINE].",
+      "[PROGRAMME NAME] — [DAY], [TIME], [LOCATION].\n\nSpots: [NUMBER] remaining.\nFee: [FEE DETAIL].\n\nThis is the one parents keep asking about. [CTA OFFER] to secure your spot.",
+    ],
+    script: [
+      "Hook: \"[NUMBER] spots left for [INTAKE PERIOD] at [SCHOOL].\"\nBody: \"[PROGRAMME NAME] gives your child [OUTCOME]. [SPECIFIC DETAIL]. [PROOF ASSET].\"\nCTA: \"[CTA OFFER] before [DEADLINE] — link below.\"",
+    ],
+  },
+};
+
+const CLIENTS  = Object.keys(CLIENT_PROFILES);
+const ANGLES   = Object.keys(FORMULAS);
+const FORMATS  = ["Static Creative", "Meta Caption", "Video Script"];
+const FKEYS    = ["headline","body","caption","script"]; // format index → key map
+const FKEY_MAP = [["headline","body"], ["caption"], ["script"]];
+
+const WEEKS    = Array.from({length:52}, (_,i) => `W${i+1}`);
+const ALL_ANGLES = ANGLES;
+const PROOF_TYPES = ["Parent quote","Stat/result","Before/after copy","Named testimonial","Visual demo","None — hook carries it"];
+const ALL_FORMATS = ["Static Square + Story","Carousel Square","Short Video Story","Static Square only","Static Story only"];
+const TRACKS   = ["Staple","Home Run"];
+const PERF_STATUSES = ["Running","Winner → Staple","Retired"];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+
+let cwState = {
+  client: CLIENTS[0],
+  angle:  ANGLES[0],
+  format: 0,
+  selected: { headline:0, body:0, caption:0, script:0 },
+  copied: null,
+};
+
+let cosState = {
+  tab: 'brief',
+  brief: {
+    client: CLIENTS[0], week: currentWeek(),
+    rows: defaultBriefRows(),
+  },
+  log: {
+    entries: [],
+    client: CLIENTS[0], week: currentWeek(),
+    angle:'', proof:'', format:'', track:'Staple', note:'',
+  },
+  tracker: {
+    entries: [],
+    client: CLIENTS[0], week: currentWeek(),
+    angle:'', format:'', status:'Running', cpl:'', enquiries:'', notes:'',
+  },
+};
+
+function currentWeek() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  return `W${Math.ceil((now - start) / 604800000)}`;
+}
+function defaultBriefRows() {
+  return Array.from({length:5}, (_,i) => ({
+    id: Date.now()+i, angle:'', proof:'', format:'', track:'Staple', hook:'', visual:''
+  }));
+}
+let _idCounter = Date.now() + 1000;
+function uid() { return ++_idCounter; }
+
+// ══════════════════════════════════════════════════════════════
+// PANEL SWITCHING
+// ══════════════════════════════════════════════════════════════
+
+function switchPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+  document.getElementById(`panel-${name}`).classList.add('visible');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.remove('active','active-gold');
+    if (t.dataset.panel === name) {
+      t.classList.add(name === 'copy-writer' ? 'active' : 'active');
+    }
+  });
+  if (name === 'creative-os') cosRender();
+}
+
+// ══════════════════════════════════════════════════════════════
+// COPY WRITER
+// ══════════════════════════════════════════════════════════════
+
+function cwInit() {
+  // Populate client select
+  const sel = document.getElementById('cw-client');
+  CLIENTS.forEach(c => {
+    const o = document.createElement('option');
+    o.value = o.textContent = c;
+    sel.appendChild(o);
+  });
+  sel.value = cwState.client;
+  sel.onchange = () => { cwState.client = sel.value; cwRender(); };
+
+  // Angle buttons
+  const ang = document.getElementById('cw-angles');
+  ANGLES.forEach(a => {
+    const b = document.createElement('button');
+    b.className = 'angle-btn' + (a === cwState.angle ? ' active' : '');
+    b.textContent = a;
+    b.onclick = () => { cwState.angle = a; cwRender(); };
+    ang.appendChild(b);
+  });
+
+  cwRender();
+}
+
+function cwSetFormat(i) {
+  cwState.format = i;
+  document.querySelectorAll('.format-tab').forEach((b,j) => {
+    b.classList.toggle('active', i===j);
+  });
+  cwRenderFormulas();
+}
+
+function cwRender() {
+  // Angle buttons
+  document.querySelectorAll('.angle-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === cwState.angle);
+  });
+  // Profile
+  const p = CLIENT_PROFILES[cwState.client];
+  const rows = [
+    ['TYPE', p.type], ['TONE', p.tone], ['AUDIENCE', p.audience],
+    ['FEAR CORE', p.fearCore], ['DESIRE CORE', p.desireCore],
+    ['PROOF', p.proofAssets], ['CTA OFFER', p.ctaOffer],
+  ];
+  document.getElementById('cw-profile').innerHTML =
+    rows.map(([l,v]) => `<div class="profile-row"><div class="label">${l}</div><div class="profile-val">${v}</div></div>`).join('') +
+    `<div class="voice-warning">${p.voiceNotes}</div>`;
+  cwRenderFormulas();
+}
+
+function cwRenderFormulas() {
+  const f = FORMULAS[cwState.angle];
+  const fmt = cwState.format;
+  const container = document.getElementById('cw-formulas');
+  container.innerHTML = '';
+
+  if (fmt === 0) {
+    // Static: headline + body
+    container.appendChild(cwSection('HEADLINE FORMULAS', f.headline, 'headline'));
+    const div = document.createElement('div');
+    div.className = 'divider'; container.appendChild(div);
+    container.appendChild(cwSection('BODY COPY FORMULAS (1–2 lines)', f.body, 'body'));
+    container.appendChild(cwInfoBox([
+      '1. Pick a headline formula above',
+      '2. Pick a body formula',
+      '3. Replace <span class="tag">[BRACKETS]</span> with client-specific details',
+      '4. Keep headline under 8 words',
+      '5. Body = 1 sentence max on static. Every word earns its place.',
+    ], false));
+  } else if (fmt === 1) {
+    container.appendChild(cwSection('CAPTION FORMULAS (PRIMARY TEXT)', f.caption, 'caption'));
+    container.appendChild(cwInfoBox([
+      '• First line = hook. Must work without the image.',
+      '• Short paragraphs. White space is not wasted space.',
+      '• Proof before CTA — always earn the ask.',
+      '• One CTA only. Don\'t give them two things to do.',
+      '• Replace <span class="tag">[BRACKETS]</span> with real specifics — fake specificity kills trust.',
+    ], false));
+  } else {
+    container.appendChild(cwSection('SCRIPT STRUCTURE', f.script, 'script'));
+    container.appendChild(cwInfoBox([
+      'Hook → 0–3 sec. One sentence. Pattern interrupt.',
+      'Body → 3–12 sec. Proof or mechanism. No waffle.',
+      'CTA → 12–15 sec. One action. Clear and direct.',
+      '',
+      'Total target: 15 sec. Hard cap: 30 sec for cold audiences.',
+    ], true));
+    container.appendChild(cwInfoBox([
+      '• Write how people speak — read it aloud before using it.',
+      '• Hook must work as text overlay AND spoken word.',
+      '• Body: one idea only. Not a feature list.',
+      '• CTA: verb first. "Book", "Click", "DM us".',
+      '• Replace <span class="tag">[BRACKETS]</span> with real details — never leave a placeholder live.',
+    ], false));
+  }
+}
+
+function cwSection(title, items, key) {
+  const wrap = document.createElement('div');
+  wrap.className = 'formula-section';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'formula-header';
+  hdr.innerHTML = `<div class="section-label">${title}</div>`;
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.id = `copy-btn-${key}`;
+  btn.textContent = 'COPY';
+  btn.onclick = () => cwCopy(items[cwState.selected[key]], key);
+  hdr.appendChild(btn);
+  wrap.appendChild(hdr);
+
+  items.forEach((text, i) => {
+    const card = document.createElement('div');
+    card.className = 'formula-card' + (cwState.selected[key]===i ? ' selected' : '');
+    card.textContent = text;
+    card.onclick = () => {
+      cwState.selected[key] = i;
+      cwRenderFormulas();
+    };
+    wrap.appendChild(card);
+  });
+
+  if (key === 'headline') {
+    const prev = document.createElement('div');
+    prev.className = 'selected-preview';
+    prev.innerHTML = 'Selected: <span class="highlight">' + cwHighlight(items[cwState.selected[key]]) + '</span>';
+    wrap.appendChild(prev);
+  }
+  return wrap;
+}
+
+function cwHighlight(text) {
+  return text.replace(/\[[^\]]+\]/g, m => `<span class="tag">${m}</span>`);
+}
+
+function cwCopy(text, id) {
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+  const btn = document.getElementById(`copy-btn-${id}`);
+  if (btn) { btn.textContent = 'COPIED'; btn.classList.add('copied'); }
+  setTimeout(() => {
+    if (btn) { btn.textContent = 'COPY'; btn.classList.remove('copied'); }
+  }, 1800);
+}
+
+function cwInfoBox(lines, gold) {
+  const box = document.createElement('div');
+  box.className = 'info-box' + (gold ? ' gold' : '');
+  box.innerHTML = `<p>${lines.filter(Boolean).join('<br>')}</p>`;
+  return box;
+}
+
+// ══════════════════════════════════════════════════════════════
+// CREATIVE OS
+// ══════════════════════════════════════════════════════════════
+
+function cosSetTab(tab) {
+  cosState.tab = tab;
+  document.querySelectorAll('.cos-tab').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(tab === 'brief' ? 'brief' : tab === 'log' ? 'log' : 'perf') ||
+      (tab === 'tracker' && b.textContent.toLowerCase().includes('perf')) ||
+      (tab === 'brief'   && b.textContent.toLowerCase().includes('brief')) ||
+      (tab === 'log'     && b.textContent.toLowerCase().includes('log')));
+  });
+  // simpler: match by onclick attr pattern
+  document.querySelectorAll('.cos-tab').forEach(b => {
+    const match = b.getAttribute('onclick').includes(`'${tab}'`);
+    b.classList.toggle('active', match);
+  });
+  cosRender();
+}
+
+function cosRender() {
+  const el = document.getElementById('cos-content');
+  el.innerHTML = '';
+  if (cosState.tab === 'brief')   el.appendChild(cosBriefView());
+  if (cosState.tab === 'log')     el.appendChild(cosLogView());
+  if (cosState.tab === 'tracker') el.appendChild(cosTrackerView());
+}
+
+// ── BRIEF ──
+function cosBriefView() {
+  const wrap = document.createElement('div');
+  const s = cosState.brief;
+  const hrCount = s.rows.filter(r => r.track === 'Home Run').length;
+
+  // Controls
+  wrap.innerHTML = `
+    <div class="brief-controls">
+      <div class="ctrl-group">
+        <div class="label">Client</div>
+        <select id="brief-client" onchange="cosState.brief.client=this.value">${CLIENTS.map(c=>`<option${c===s.client?' selected':''}>${c}</option>`).join('')}</select>
+      </div>
+      <div class="ctrl-group">
+        <div class="label">Week</div>
+        <select id="brief-week" onchange="cosState.brief.week=this.value" style="min-width:90px">${WEEKS.map(w=>`<option${w===s.week?' selected':''}>${w}</option>`).join('')}</select>
+      </div>
+      <div class="stat-pill">${hrCount} HOME RUN${hrCount!==1?'S':''} / ${s.rows.length} TOTAL</div>
+    </div>
+    <div class="rule-box"><strong>RULE:</strong> Fill this before opening Canva. Max 1 Home Run per client per week. Design direction is dictated by the concept — not the other way around.</div>
+  `;
+
+  // Table
+  const tableWrap = document.createElement('div');
+  tableWrap.className = 'brief-table-wrap';
+
+  const table = document.createElement('table');
+  table.innerHTML = `<thead><tr>
+    <th>#</th><th>Angle</th><th>Proof Type</th><th>Format</th><th>Track</th>
+    <th>Hook Direction (1 line)</th><th>Visual Note</th><th></th>
+  </tr></thead>`;
+
+  const tbody = document.createElement('tbody');
+  s.rows.forEach((row, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="row-num ${row.track==='Home Run'?'homerun':'staple'}">${i+1}</div></td>
+      <td>${sel('', ALL_ANGLES, row.angle, v => { row.angle=v; cosRender(); })}</td>
+      <td>${sel('', PROOF_TYPES, row.proof, v => { row.proof=v; })}</td>
+      <td>${sel('', ALL_FORMATS, row.format, v => { row.format=v; })}</td>
+      <td>${sel('track', TRACKS, row.track, v => { row.track=v; cosRender(); }, row.track==='Home Run'?'track-select-homerun':'track-select-staple')}</td>
+      <td><input placeholder="e.g. Fear of missing P1 window..." value="${esc(row.hook)}" oninput="cosState.brief.rows[${i}].hook=this.value" style="min-width:160px"></td>
+      <td><input placeholder="e.g. Bold text-heavy, dark bg..." value="${esc(row.visual)}" oninput="cosState.brief.rows[${i}].visual=this.value" style="min-width:140px"></td>
+      <td><button class="del-btn" onclick="cosState.brief.rows.splice(${i},1);cosRender()">×</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  wrap.appendChild(tableWrap);
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row';
+  btnRow.innerHTML = `
+    <button class="btn" onclick="cosState.brief.rows.push({id:uid(),angle:'',proof:'',format:'',track:'Staple',hook:'',visual:''});cosRender()">+ ADD ROW</button>
+    <button class="btn primary" onclick="cosSaveBriefToLog()">SAVE TO CONCEPT LOG →</button>
+  `;
+  wrap.appendChild(btnRow);
+  return wrap;
+}
+
+function sel(type, options, current, onChange, extraClass='') {
+  const id = `sel-${uid()}`;
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) { el.value = current; el.onchange = e => onChange(e.target.value); }
+  }, 0);
+  return `<select id="${id}" class="${extraClass}">
+    <option value="">Select...</option>
+    ${options.map(o => `<option${o===current?' selected':''}>${o}</option>`).join('')}
+  </select>`;
+}
+
+function cosSaveBriefToLog() {
+  const s = cosState.brief;
+  s.rows.forEach(row => {
+    if (row.angle && row.format) {
+      cosState.log.entries.unshift({
+        id: uid(), client: s.client, week: s.week,
+        angle: row.angle, proof: row.proof, format: row.format,
+        track: row.track, note: row.hook,
+      });
+    }
+  });
+  cosSetTab('log');
+}
+
+// ── LOG ──
+function cosLogView() {
+  const wrap = document.createElement('div');
+  const s = cosState.log;
+
+  wrap.innerHTML = `<div class="rule-box"><strong>RULE:</strong> Log every concept you run. Winners become staples. Retired concepts are never repeated without changing 2+ variables.</div>`;
+
+  // Add form
+  const form = document.createElement('div');
+  form.className = 'add-form';
+  form.innerHTML = `<div class="add-form-title">ADD CONCEPT</div>
+    <div class="add-form-fields">
+      <div class="ctrl-group"><div class="label">Client</div><select id="log-client">${CLIENTS.map(c=>`<option${c===s.client?' selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Week</div><select id="log-week" style="min-width:80px">${WEEKS.map(w=>`<option${w===s.week?' selected':''}>${w}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Angle</div><select id="log-angle"><option value="">Select...</option>${ALL_ANGLES.map(a=>`<option>${a}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Proof Type</div><select id="log-proof"><option value="">Select...</option>${PROOF_TYPES.map(p=>`<option>${p}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Format</div><select id="log-format"><option value="">Select...</option>${ALL_FORMATS.map(f=>`<option>${f}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Track</div><select id="log-track">${TRACKS.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="ctrl-group wide"><div class="label">Note / Hook Direction</div><input id="log-note" placeholder="Optional..."></div>
+      <button class="add-btn" onclick="cosAddLogEntry()">ADD</button>
+    </div>`;
+  wrap.appendChild(form);
+
+  // Table
+  if (!cosState.log.entries.length) {
+    wrap.innerHTML += `<div class="empty-state">NO CONCEPTS LOGGED YET — ADD ONE ABOVE OR SAVE FROM BRIEF</div>`;
+    return wrap;
+  }
+
+  const tableWrap = document.createElement('div');
+  tableWrap.style.overflowX = 'auto';
+  const table = document.createElement('table');
+  table.innerHTML = `<thead><tr><th>Client</th><th>Week</th><th>Angle</th><th>Proof Type</th><th>Format</th><th>Track</th><th>Note</th></tr></thead>`;
+  const tbody = document.createElement('tbody');
+  cosState.log.entries.forEach(e => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${e.client}</td><td>${e.week}</td><td>${e.angle}</td>
+      <td>${e.proof||'—'}</td><td>${e.format}</td>
+      <td><span class="badge ${e.track==='Home Run'?'homerun':'staple'}">${e.track}</span></td>
+      <td style="color:var(--dim)">${e.note||'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  wrap.appendChild(tableWrap);
+  return wrap;
+}
+
+function cosAddLogEntry() {
+  const angle = document.getElementById('log-angle').value;
+  const format = document.getElementById('log-format').value;
+  if (!angle || !format) return;
+  cosState.log.entries.unshift({
+    id: uid(),
+    client: document.getElementById('log-client').value,
+    week:   document.getElementById('log-week').value,
+    angle, format,
+    proof:  document.getElementById('log-proof').value,
+    track:  document.getElementById('log-track').value,
+    note:   document.getElementById('log-note').value,
+  });
+  cosRender();
+}
+
+// ── TRACKER ──
+function cosTrackerView() {
+  const wrap = document.createElement('div');
+  const s = cosState.tracker;
+
+  wrap.innerHTML = `<div class="rule-box"><strong>RULE:</strong> Review weekly. Winner = CPL below target or enquiries above baseline for 2+ weeks. Retire anything flat after 3 weeks. Winners feed next week's staples.</div>`;
+
+  const form = document.createElement('div');
+  form.className = 'add-form';
+  form.innerHTML = `<div class="add-form-title">LOG PERFORMANCE</div>
+    <div class="add-form-fields">
+      <div class="ctrl-group"><div class="label">Client</div><select id="tr-client">${CLIENTS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Week</div><select id="tr-week" style="min-width:80px">${WEEKS.map(w=>`<option${w===s.week?' selected':''}>${w}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Angle</div><select id="tr-angle"><option value="">Select...</option>${ALL_ANGLES.map(a=>`<option>${a}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">Format</div><select id="tr-format"><option value="">Select...</option>${ALL_FORMATS.map(f=>`<option>${f}</option>`).join('')}</select></div>
+      <div class="ctrl-group"><div class="label">CPL (S$)</div><input id="tr-cpl" placeholder="e.g. 18"></div>
+      <div class="ctrl-group"><div class="label">Enquiries</div><input id="tr-enq" placeholder="e.g. 5"></div>
+      <div class="ctrl-group"><div class="label">Status</div><select id="tr-status">${PERF_STATUSES.map(p=>`<option>${p}</option>`).join('')}</select></div>
+      <div class="ctrl-group wide"><div class="label">Notes</div><input id="tr-notes" placeholder="What worked / what didn't..."></div>
+      <button class="add-btn" onclick="cosAddTrackerEntry()">LOG</button>
+    </div>`;
+  wrap.appendChild(form);
+
+  if (!cosState.tracker.entries.length) {
+    wrap.innerHTML += `<div class="empty-state">NO PERFORMANCE DATA YET — LOG YOUR FIRST ENTRY ABOVE</div>`;
+    return wrap;
+  }
+
+  const tableWrap = document.createElement('div');
+  tableWrap.style.overflowX = 'auto';
+  const table = document.createElement('table');
+  table.innerHTML = `<thead><tr><th>Client</th><th>Week</th><th>Angle</th><th>Format</th><th>CPL</th><th>Enquiries</th><th>Status</th><th>Notes</th></tr></thead>`;
+  const tbody = document.createElement('tbody');
+  cosState.tracker.entries.forEach(e => {
+    const statusClass = e.status === 'Winner → Staple' ? 'status-winner' : e.status === 'Retired' ? 'status-retired' : 'status-running';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${e.client}</td><td>${e.week}</td><td>${e.angle}</td><td>${e.format}</td>
+      <td style="color:var(--orange);font-weight:700">${e.cpl?'S$'+e.cpl:'—'}</td>
+      <td style="color:var(--green);font-weight:700">${e.enquiries||'—'}</td>
+      <td><select class="${statusClass}" onchange="cosUpdateStatus(${e.id},this.value)">${PERF_STATUSES.map(p=>`<option${p===e.status?' selected':''}>${p}</option>`).join('')}</select></td>
+      <td style="color:var(--dim)">${e.notes||'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  wrap.appendChild(tableWrap);
+  return wrap;
+}
+
+function cosAddTrackerEntry() {
+  const angle = document.getElementById('tr-angle').value;
+  const format = document.getElementById('tr-format').value;
+  if (!angle || !format) return;
+  cosState.tracker.entries.unshift({
+    id: uid(),
+    client:    document.getElementById('tr-client').value,
+    week:      document.getElementById('tr-week').value,
+    angle, format,
+    status:    document.getElementById('tr-status').value,
+    cpl:       document.getElementById('tr-cpl').value,
+    enquiries: document.getElementById('tr-enq').value,
+    notes:     document.getElementById('tr-notes').value,
+  });
+  cosRender();
+}
+
+function cosUpdateStatus(id, status) {
+  const e = cosState.tracker.entries.find(e => e.id === id);
+  if (e) e.status = status;
+}
+
+// ── UTILS ──
+function esc(str) {
+  return (str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+cwInit();
+cosRender();
+</script>
+</body>
+</html>
