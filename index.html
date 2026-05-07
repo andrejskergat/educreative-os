@@ -10,19 +10,19 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:       #0a0a16;
-    --bg2:      #0d0d1e;
-    --bg3:      #111128;
-    --border:   #1e1e36;
-    --border2:  #2a2a4a;
-    --text:     #ccccee;
-    --muted:    #555577;
-    --dim:      #333355;
+    --bg:       #f5f5f7;
+    --bg2:      #ffffff;
+    --bg3:      #ededf0;
+    --border:   #d0d0dc;
+    --border2:  #b8b8cc;
+    --text:     #1a1a2e;
+    --muted:    #666680;
+    --dim:      #9999b0;
     --purple:   #7b61ff;
-    --gold:     #ffb400;
-    --green:    #00c896;
-    --red:      #ff4d4d;
-    --orange:   #f5a623;
+    --gold:     #c98a00;
+    --green:    #007a5a;
+    --red:      #cc2222;
+    --orange:   #c47000;
   }
 
   body {
@@ -43,7 +43,7 @@
 
   /* ── TOP NAV ── */
   #top-nav {
-    background: linear-gradient(135deg, #0d0d20 0%, #0a0a16 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 100%);
     border-bottom: 1px solid var(--border);
     padding: 0 28px;
     display: flex;
@@ -60,7 +60,7 @@
     border-right: 1px solid var(--border);
     margin-right: 20px;
   }
-  .nav-brand-sub { font-size: 9px; color: #444466; letter-spacing: 3px; margin-bottom: 4px; }
+  .nav-brand-sub { font-size: 9px; color: #888899; letter-spacing: 3px; margin-bottom: 4px; }
   .nav-brand-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #fff; }
   .nav-brand-title span { color: var(--purple); }
 
@@ -102,7 +102,7 @@
     width: 270px;
     min-width: 270px;
     border-right: 1px solid var(--border);
-    background: #0c0c1a;
+    background: #ededf0;
     overflow-y: auto;
     padding: 18px;
     display: flex;
@@ -119,7 +119,7 @@
   }
 
   select, input {
-    background: #141420;
+    background: #ffffff;
     color: var(--text);
     border: 1px solid var(--border2);
     border-radius: 7px;
@@ -515,7 +515,7 @@
     width: 280px;
     min-width: 280px;
     border-right: 1px solid var(--border);
-    background: #0c0c1a;
+    background: #ededf0;
     overflow-y: auto;
     padding: 20px 18px;
     display: flex;
@@ -558,7 +558,7 @@
   .mr-field { display: flex; flex-direction: column; gap: 5px; }
   .mr-field .label { margin-bottom: 0; }
   .mr-field input {
-    background: #141420;
+    background: #ffffff;
     color: var(--text);
     border: 1px solid var(--border2);
     border-radius: 7px;
@@ -756,7 +756,7 @@
   /* scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #222244; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: #ccccdd; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -1654,7 +1654,7 @@ function mrInit() {
     row.className = 'pipeline-row';
     row.innerHTML = `
       <div class="pipeline-stage-name">${s.label}</div>
-      <input type="number" id="mr-pipe-${s.key}" placeholder="0" oninput="mrUpdate()" min="0" style="background:#141420;color:var(--text);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;font-weight:700;outline:none;">
+      <input type="number" id="mr-pipe-${s.key}" placeholder="0" oninput="mrUpdate()" min="0" style="background:#ffffff;color:var(--text);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;font-weight:700;outline:none;">
     `;
     pipeWrap.appendChild(row);
   });
