@@ -1629,12 +1629,15 @@ function esc(str) {
 // ══════════════════════════════════════════════════════════════
 
 const PIPELINE_STAGES = [
-  { key: 'new',       label: 'New Enquiry',       color: '#7b61ff' },
-  { key: 'contacted', label: 'Contacted',          color: '#5599ff' },
-  { key: 'tour',      label: 'Tour Booked',        color: '#ffb400' },
-  { key: 'toured',    label: 'Tour Completed',     color: '#f5a623' },
-  { key: 'enrolled',  label: 'Enrolled',           color: '#00c896' },
-  { key: 'lost',      label: 'Lost / Not Interested', color: '#ff4d4d' },
+  { key: 'new',       label: 'New Enquiry',          color: '#7b61ff', valid: true  },
+  { key: 'contacted', label: 'Contacted',             color: '#5599ff', valid: true  },
+  { key: 'tour',      label: 'Tour Booked',           color: '#ffb400', valid: true  },
+  { key: 'toured',    label: 'Tour Completed',        color: '#f5a623', valid: true  },
+  { key: 'enrolled',  label: 'Enrolled',              color: '#007a5a', valid: true  },
+  { key: 'lost',      label: 'Lost / Not Interested', color: '#cc2222', valid: true  },
+  { key: 'job',       label: 'Job Application',       color: '#b8b8cc', valid: false },
+  { key: 'b2b',       label: 'B2B / Spam',            color: '#b8b8cc', valid: false },
+  { key: 'invalid',   label: 'Wrong No. / Duplicate', color: '#b8b8cc', valid: false },
 ];
 
 const MONTHS = [
@@ -1674,12 +1677,20 @@ function mrInit() {
 
   // Pipeline inputs
   const pipeWrap = document.getElementById('mr-pipeline-inputs');
+  let dividerAdded = false;
   PIPELINE_STAGES.forEach(s => {
+    if (!s.valid && !dividerAdded) {
+      dividerAdded = true;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'display:flex;align-items:center;gap:8px;margin:12px 0 10px';
+      sep.innerHTML = `<div style="flex:1;height:1px;background:#d0d0dc"></div><div style="font-size:9px;letter-spacing:1.5px;color:#b8b8cc;text-transform:uppercase;white-space:nowrap">Invalid Leads</div><div style="flex:1;height:1px;background:#d0d0dc"></div>`;
+      pipeWrap.appendChild(sep);
+    }
     const row = document.createElement('div');
     row.className = 'pipeline-row';
     row.innerHTML = `
-      <div class="pipeline-stage-name">${s.label}</div>
-      <input type="number" id="mr-pipe-${s.key}" placeholder="0" oninput="mrUpdate()" min="0" style="background:#ffffff;color:var(--text);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;font-weight:700;outline:none;">
+      <div class="pipeline-stage-name" style="color:${s.valid ? '#666680' : '#b8b8cc'}">${s.label}</div>
+      <input type="number" id="mr-pipe-${s.key}" placeholder="0" oninput="mrUpdate()" min="0" style="background:#ffffff;color:${s.valid ? '#1a1a2e' : '#9999b0'};border:1px solid #d0d0dc;border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;font-weight:700;outline:none;">
     `;
     pipeWrap.appendChild(row);
   });
@@ -1713,9 +1724,12 @@ function mrRender() {
   const paidEnq    = data.metaEnq + data.googleEnq;
   const totalEnq   = paidEnq + data.otherEnq;
   const cpl        = paidEnq > 0 ? totalSpend / paidEnq : 0;
-  const pipeTotal  = Object.values(data.pipeline).reduce((a,b) => a+b, 0);
-  const enrolled   = data.pipeline.enrolled || 0;
-  const touring    = (data.pipeline.tour || 0) + (data.pipeline.toured || 0);
+  const validKeys   = PIPELINE_STAGES.filter(s => s.valid).map(s => s.key);
+  const invalidKeys = PIPELINE_STAGES.filter(s => !s.valid).map(s => s.key);
+  const pipeTotal   = validKeys.reduce((a,k) => a + (data.pipeline[k]||0), 0);
+  const invalidTotal= invalidKeys.reduce((a,k) => a + (data.pipeline[k]||0), 0);
+  const enrolled    = data.pipeline.enrolled || 0;
+  const touring     = (data.pipeline.tour || 0) + (data.pipeline.toured || 0);
   const client     = mrState.client;
   const month      = mrState.month;
   const name       = data.contactName || 'there';
@@ -1752,7 +1766,7 @@ function mrRender() {
       <div class="kpi-card">
         <div class="kpi-label">Pipeline</div>
         <div class="kpi-value purple">${enrolled} enrolled</div>
-        <div class="kpi-sub">${touring} touring · ${pipeTotal} total leads</div>
+        <div class="kpi-sub">${touring} touring · ${pipeTotal} valid${invalidTotal > 0 ? ` · <span style="color:#b8b8cc">${invalidTotal} invalid</span>` : ''}</div>
       </div>
     </div>
   `;
@@ -1795,15 +1809,18 @@ function mrRender() {
       <details style="margin-top:16px">
         <summary style="font-size:9px;letter-spacing:2px;color:#9999b0;text-transform:uppercase;cursor:pointer;user-select:none;padding:4px 0">Pipeline Breakdown ▸</summary>
         <div style="margin-top:12px">
-          ${PIPELINE_STAGES.map(s => {
+          ${PIPELINE_STAGES.map((s, i) => {
             const count = data.pipeline[s.key] || 0;
-            const pct = pipeTotal > 0 ? (count / pipeTotal * 100) : 0;
-            return `<div class="pipeline-stage-row">
-              <div class="ps-name">${s.label}</div>
-              <div class="ps-count" style="color:${s.color}">${count}</div>
-              <div class="ps-bar-wrap"><div class="ps-bar" style="width:${pct}%;background:${s.color}"></div></div>
-              <div class="ps-pct">${pct.toFixed(0)}%</div>
-            </div>`;
+            const base  = s.valid ? pipeTotal : invalidTotal;
+            const pct   = base > 0 ? (count / base * 100) : 0;
+            const divider = (!s.valid && (i === 0 || PIPELINE_STAGES[i-1].valid))
+              ? '<div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px"><div style="flex:1;height:1px;background:#d0d0dc"></div><div style="font-size:9px;letter-spacing:1.5px;color:#b8b8cc;text-transform:uppercase;white-space:nowrap">Invalid Leads</div><div style="flex:1;height:1px;background:#d0d0dc"></div></div>' : '';
+            return divider + '<div class="pipeline-stage-row">' +
+              '<div class="ps-name" style="color:' + (s.valid ? '#666680' : '#b8b8cc') + '">' + s.label + '</div>' +
+              '<div class="ps-count" style="color:' + s.color + '">' + count + '</div>' +
+              '<div class="ps-bar-wrap"><div class="ps-bar" style="width:' + pct.toFixed(0) + '%;background:' + s.color + '"></div></div>' +
+              '<div class="ps-pct" style="color:' + (s.valid ? '#9999b0' : '#b8b8cc') + '">' + pct.toFixed(0) + '%</div>' +
+              '</div>';
           }).join('')}
         </div>
       </details>
