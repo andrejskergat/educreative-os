@@ -501,6 +501,258 @@
     letter-spacing: 1px;
   }
 
+  /* ════════════════════════════════════════
+     MONTHLY REPORT PANEL
+  ════════════════════════════════════════ */
+  #mr-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    gap: 0;
+  }
+
+  #mr-sidebar {
+    width: 280px;
+    min-width: 280px;
+    border-right: 1px solid var(--border);
+    background: #0c0c1a;
+    overflow-y: auto;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  #mr-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+
+  .mr-section {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .mr-section-title {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #5555aa;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .mr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mr-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mr-field { display: flex; flex-direction: column; gap: 5px; }
+  .mr-field .label { margin-bottom: 0; }
+  .mr-field input {
+    background: #141420;
+    color: var(--text);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .mr-field input:focus { border-color: var(--purple); outline: none; }
+  .mr-field input.currency { color: var(--gold); }
+
+  .pipeline-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .pipeline-stage-name {
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 130px;
+    letter-spacing: 0.5px;
+  }
+  .pipeline-row input {
+    width: 80px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .pipeline-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .pipeline-bar { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+  /* Report output card */
+  .report-card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .report-client-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .report-period {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .report-generated {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-align: right;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .kpi-label {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-value.gold { color: var(--gold); }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.purple { color: var(--purple); }
+  .kpi-value.orange { color: var(--orange); }
+  .kpi-sub {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+  }
+
+  .spend-breakdown {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .spend-source {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .spend-source-label {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .spend-source-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .spend-pct {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .pipeline-report {
+    margin-bottom: 0;
+  }
+  .pipeline-report-title {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .pipeline-stage-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .ps-name { font-size: 11px; color: var(--muted); min-width: 150px; }
+  .ps-count { font-size: 14px; font-weight: 700; color: #fff; min-width: 30px; text-align: right; }
+  .ps-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .ps-bar { height: 100%; border-radius: 4px; }
+  .ps-pct { font-size: 10px; color: var(--dim); min-width: 36px; text-align: right; }
+
+  .report-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .source-badge.manual {
+    background: rgba(85,85,119,0.2);
+    border: 1px solid rgba(85,85,119,0.4);
+    color: var(--muted);
+  }
+  .source-badge.live {
+    background: rgba(0,200,150,0.1);
+    border: 1px solid rgba(0,200,150,0.3);
+    color: var(--green);
+  }
+  .source-badge .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
   /* scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -519,6 +771,7 @@
     </div>
     <button class="nav-tab active" data-panel="copy-writer" onclick="switchPanel('copy-writer')">Copy Writer</button>
     <button class="nav-tab" data-panel="creative-os" onclick="switchPanel('creative-os')">Weekly Brief &amp; Tracker</button>
+    <button class="nav-tab" data-panel="monthly-report" onclick="switchPanel('monthly-report')">Monthly Report</button>
   </nav>
 
   <!-- ══════════════════════════════════════════
@@ -566,6 +819,80 @@
         <button class="cos-tab" onclick="cosSetTab('tracker')">Performance Tracker</button>
       </div>
       <div id="cos-content"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MONTHLY REPORT PANEL
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="panel-monthly-report">
+    <div id="mr-body">
+
+      <!-- Sidebar: data entry -->
+      <div id="mr-sidebar">
+
+        <div>
+          <div class="label">Client</div>
+          <select id="mr-client" onchange="mrRender()"></select>
+        </div>
+
+        <div>
+          <div class="label">Report Month</div>
+          <select id="mr-month" onchange="mrRender()"></select>
+        </div>
+
+        <!-- Ad Spend -->
+        <div class="mr-section">
+          <div class="mr-section-title">Ad Spend (S$)</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="mr-field">
+              <div class="label">Meta Ads</div>
+              <input class="currency" type="number" id="mr-meta-spend" placeholder="0.00" oninput="mrUpdate()" min="0" step="0.01">
+            </div>
+            <div class="mr-field">
+              <div class="label">Google Ads</div>
+              <input class="currency" type="number" id="mr-google-spend" placeholder="0.00" oninput="mrUpdate()" min="0" step="0.01">
+            </div>
+          </div>
+        </div>
+
+        <!-- Enquiries -->
+        <div class="mr-section">
+          <div class="mr-section-title">Enquiries</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="mr-field">
+              <div class="label">From Meta Ads</div>
+              <input type="number" id="mr-meta-enq" placeholder="0" oninput="mrUpdate()" min="0">
+            </div>
+            <div class="mr-field">
+              <div class="label">From Google Ads</div>
+              <input type="number" id="mr-google-enq" placeholder="0" oninput="mrUpdate()" min="0">
+            </div>
+            <div class="mr-field">
+              <div class="label">Organic / Other</div>
+              <input type="number" id="mr-other-enq" placeholder="0" oninput="mrUpdate()" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline -->
+        <div class="mr-section">
+          <div class="mr-section-title">GHL Pipeline Stages</div>
+          <div id="mr-pipeline-inputs"></div>
+        </div>
+
+        <button class="btn primary" onclick="mrSaveSnapshot()" style="width:100%;text-align:center">
+          SAVE REPORT SNAPSHOT
+        </button>
+
+      </div>
+
+      <!-- Content: live report -->
+      <div id="mr-content">
+        <div id="mr-report-output"></div>
+        <div id="mr-history"></div>
+      </div>
+
     </div>
   </div>
 
@@ -849,6 +1176,7 @@ function switchPanel(name) {
     }
   });
   if (name === 'creative-os') cosRender();
+  if (name === 'monthly-report') { if (!mrState._init) { mrInit(); mrState._init = true; } else mrRender(); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1269,6 +1597,322 @@ function cosUpdateStatus(id, status) {
 // ── UTILS ──
 function esc(str) {
   return (str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MONTHLY REPORT
+// ══════════════════════════════════════════════════════════════
+
+const PIPELINE_STAGES = [
+  { key: 'new',       label: 'New Enquiry',       color: '#7b61ff' },
+  { key: 'contacted', label: 'Contacted',          color: '#5599ff' },
+  { key: 'tour',      label: 'Tour Booked',        color: '#ffb400' },
+  { key: 'toured',    label: 'Tour Completed',     color: '#f5a623' },
+  { key: 'enrolled',  label: 'Enrolled',           color: '#00c896' },
+  { key: 'lost',      label: 'Lost / Not Interested', color: '#ff4d4d' },
+];
+
+const MONTHS = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+];
+
+let mrState = {
+  client: CLIENTS[0],
+  month: '',
+  snapshots: [],
+};
+
+function mrInit() {
+  // Client select
+  const clientSel = document.getElementById('mr-client');
+  CLIENTS.forEach(c => {
+    const o = document.createElement('option');
+    o.value = o.textContent = c;
+    clientSel.appendChild(o);
+  });
+  clientSel.onchange = () => { mrState.client = clientSel.value; mrRender(); };
+
+  // Month select
+  const monthSel = document.getElementById('mr-month');
+  const now = new Date();
+  for (let i = 0; i < 13; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const val = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    const o = document.createElement('option');
+    o.value = val; o.textContent = val;
+    if (i === 1) o.selected = true;
+    monthSel.appendChild(o);
+  }
+  mrState.month = monthSel.value;
+  monthSel.onchange = () => { mrState.month = monthSel.value; mrLoadSnapshot(); mrRender(); };
+
+  // Pipeline inputs
+  const pipeWrap = document.getElementById('mr-pipeline-inputs');
+  PIPELINE_STAGES.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'pipeline-row';
+    row.innerHTML = `
+      <div class="pipeline-stage-name">${s.label}</div>
+      <input type="number" id="mr-pipe-${s.key}" placeholder="0" oninput="mrUpdate()" min="0" style="background:#141420;color:var(--text);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px;font-weight:700;outline:none;">
+    `;
+    pipeWrap.appendChild(row);
+  });
+
+  mrLoadSnapshot();
+  mrRender();
+}
+
+function mrGetInputs() {
+  const v = id => parseFloat(document.getElementById(id)?.value) || 0;
+  const metaSpend  = v('mr-meta-spend');
+  const googleSpend= v('mr-google-spend');
+  const metaEnq    = v('mr-meta-enq');
+  const googleEnq  = v('mr-google-enq');
+  const otherEnq   = v('mr-other-enq');
+  const pipeline   = {};
+  PIPELINE_STAGES.forEach(s => { pipeline[s.key] = v(`mr-pipe-${s.key}`); });
+  return { metaSpend, googleSpend, metaEnq, googleEnq, otherEnq, pipeline };
+}
+
+function mrUpdate() { mrRender(); }
+
+function mrRender() {
+  const data = mrGetInputs();
+  const totalSpend = data.metaSpend + data.googleSpend;
+  const paidEnq    = data.metaEnq + data.googleEnq;
+  const totalEnq   = paidEnq + data.otherEnq;
+  const cpl        = paidEnq > 0 ? totalSpend / paidEnq : 0;
+  const pipeTotal  = Object.values(data.pipeline).reduce((a,b) => a+b, 0);
+  const client     = mrState.client;
+  const month      = mrState.month;
+
+  const out = document.getElementById('mr-report-output');
+  if (!out) return;
+
+  // ── KPI summary ──
+  const kpiHtml = `
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Enquiries</div>
+        <div class="kpi-value green">${totalEnq}</div>
+        <div class="kpi-sub">Paid: ${paidEnq} · Organic: ${data.otherEnq}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Cost Per Enquiry</div>
+        <div class="kpi-value gold">${cpl > 0 ? 'S$' + cpl.toFixed(2) : '—'}</div>
+        <div class="kpi-sub">Paid enquiries only</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Ad Spend</div>
+        <div class="kpi-value orange">S$${totalSpend.toLocaleString('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+        <div class="kpi-sub">Meta + Google</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active Pipeline</div>
+        <div class="kpi-value purple">${pipeTotal}</div>
+        <div class="kpi-sub">Leads across all stages</div>
+      </div>
+    </div>
+  `;
+
+  // ── Spend breakdown ──
+  const metaPct   = totalSpend > 0 ? (data.metaSpend / totalSpend * 100).toFixed(0) : 0;
+  const googlePct = totalSpend > 0 ? (data.googleSpend / totalSpend * 100).toFixed(0) : 0;
+  const spendHtml = `
+    <div class="spend-breakdown">
+      <div class="spend-source">
+        <div class="spend-source-label">Meta Ads</div>
+        <div class="spend-source-value">S$${data.metaSpend.toLocaleString('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+        <div class="spend-pct">${metaPct}% of total · ${data.metaEnq} enquiries${data.metaEnq>0?' · CPL S$'+(data.metaSpend/data.metaEnq).toFixed(2):''}</div>
+      </div>
+      <div class="spend-source">
+        <div class="spend-source-label">Google Ads</div>
+        <div class="spend-source-value">S$${data.googleSpend.toLocaleString('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+        <div class="spend-pct">${googlePct}% of total · ${data.googleEnq} enquiries${data.googleEnq>0?' · CPL S$'+(data.googleSpend/data.googleEnq).toFixed(2):''}</div>
+      </div>
+    </div>
+  `;
+
+  // ── Pipeline ──
+  const activeTotal = (data.pipeline.new||0) + (data.pipeline.contacted||0) + (data.pipeline.tour||0) + (data.pipeline.toured||0);
+  const pipelineRows = PIPELINE_STAGES.map(s => {
+    const count = data.pipeline[s.key] || 0;
+    const pct   = pipeTotal > 0 ? (count / pipeTotal * 100) : 0;
+    return `
+      <div class="pipeline-stage-row">
+        <div class="ps-name">${s.label}</div>
+        <div class="ps-count" style="color:${s.color}">${count}</div>
+        <div class="ps-bar-wrap">
+          <div class="ps-bar" style="width:${pct}%;background:${s.color}"></div>
+        </div>
+        <div class="ps-pct">${pct.toFixed(0)}%</div>
+      </div>
+    `;
+  }).join('');
+
+  // ── Insight line ──
+  let insight = '';
+  if (totalEnq > 0 && cpl > 0) {
+    if (cpl < 30) insight = `CPL of S$${cpl.toFixed(2)} is strong — below the S$30 benchmark. Maintain spend mix.`;
+    else if (cpl < 60) insight = `CPL of S$${cpl.toFixed(2)} is within range. Review creative angles to push below S$30.`;
+    else insight = `CPL of S$${cpl.toFixed(2)} is above target. Recommend creative refresh before next month.`;
+  }
+  if (data.pipeline.enrolled > 0 && pipeTotal > 0) {
+    const convRate = (data.pipeline.enrolled / pipeTotal * 100).toFixed(0);
+    insight += (insight ? ' ' : '') + `Pipeline conversion to enrolled: ${convRate}%.`;
+  }
+
+  out.innerHTML = `
+    <div class="report-card">
+      <div class="report-header">
+        <div>
+          <div class="report-client-name">${esc(client)}</div>
+          <div class="report-period">${month} — Monthly Performance Report</div>
+        </div>
+        <div>
+          <div class="report-generated">Generated ${new Date().toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'numeric'})}</div>
+          <div style="margin-top:6px;text-align:right"><span class="source-badge manual"><span class="dot"></span>Manual Entry</span></div>
+        </div>
+      </div>
+
+      ${kpiHtml}
+      ${spendHtml}
+
+      <div class="pipeline-report">
+        <div class="pipeline-report-title">GHL Pipeline Breakdown (${pipeTotal} total · ${activeTotal} active)</div>
+        ${pipelineRows}
+      </div>
+
+      ${insight ? `<div class="rule-box" style="margin-top:20px;margin-bottom:0"><strong>INSIGHT:</strong> ${insight}</div>` : ''}
+    </div>
+    <div class="report-actions">
+      <button class="btn primary" onclick="mrSaveSnapshot()">SAVE SNAPSHOT</button>
+      <button class="btn" onclick="mrCopyReport()">COPY REPORT TEXT</button>
+    </div>
+  `;
+
+  mrRenderHistory();
+}
+
+function mrSnapshotKey() {
+  return `mr_${mrState.client}_${mrState.month}`;
+}
+
+function mrSaveSnapshot() {
+  const data = mrGetInputs();
+  const snap = {
+    client: mrState.client,
+    month:  mrState.month,
+    savedAt: new Date().toISOString(),
+    ...data,
+  };
+  // Replace existing or push
+  const idx = mrState.snapshots.findIndex(s => s.client === snap.client && s.month === snap.month);
+  if (idx >= 0) mrState.snapshots[idx] = snap;
+  else mrState.snapshots.unshift(snap);
+
+  // Persist to localStorage
+  try { localStorage.setItem('mr_snapshots', JSON.stringify(mrState.snapshots)); } catch(e) {}
+  mrRenderHistory();
+
+  // Flash feedback on button
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = 'SAVED ✓'; btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
+}
+
+function mrLoadSnapshot() {
+  try {
+    const raw = localStorage.getItem('mr_snapshots');
+    if (raw) mrState.snapshots = JSON.parse(raw);
+  } catch(e) {}
+
+  const snap = mrState.snapshots.find(s => s.client === mrState.client && s.month === mrState.month);
+  if (!snap) return;
+
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  setVal('mr-meta-spend',  snap.metaSpend);
+  setVal('mr-google-spend',snap.googleSpend);
+  setVal('mr-meta-enq',    snap.metaEnq);
+  setVal('mr-google-enq',  snap.googleEnq);
+  setVal('mr-other-enq',   snap.otherEnq);
+  PIPELINE_STAGES.forEach(s => setVal(`mr-pipe-${s.key}`, snap.pipeline?.[s.key] || ''));
+}
+
+function mrRenderHistory() {
+  const hist = document.getElementById('mr-history');
+  if (!hist) return;
+  const others = mrState.snapshots.filter(s => !(s.client === mrState.client && s.month === mrState.month));
+  if (!others.length) { hist.innerHTML = ''; return; }
+
+  hist.innerHTML = `
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:12px">Previous Snapshots</div>
+    ${others.slice(0,8).map(s => {
+      const totalSpend = (s.metaSpend||0) + (s.googleSpend||0);
+      const paidEnq = (s.metaEnq||0) + (s.googleEnq||0);
+      const cpl = paidEnq > 0 ? (totalSpend/paidEnq).toFixed(2) : '—';
+      const totalEnq = paidEnq + (s.otherEnq||0);
+      return `
+        <div class="mr-section" style="cursor:pointer;margin-bottom:8px" onclick="mrJumpTo('${esc(s.client)}','${esc(s.month)}')">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11px;color:var(--text);font-weight:600">${esc(s.client)}</div>
+              <div style="font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:2px">${esc(s.month)}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;color:var(--gold);font-weight:700">${totalEnq} enq · S$${cpl} CPL</div>
+              <div style="font-size:9px;color:var(--dim);margin-top:2px">Spend: S$${totalSpend.toFixed(0)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+function mrJumpTo(client, month) {
+  document.getElementById('mr-client').value = client;
+  mrState.client = client;
+  document.getElementById('mr-month').value = month;
+  mrState.month = month;
+  mrLoadSnapshot();
+  mrRender();
+}
+
+function mrCopyReport() {
+  const data = mrGetInputs();
+  const totalSpend = data.metaSpend + data.googleSpend;
+  const paidEnq = data.metaEnq + data.googleEnq;
+  const totalEnq = paidEnq + data.otherEnq;
+  const cpl = paidEnq > 0 ? 'S$' + (totalSpend / paidEnq).toFixed(2) : '—';
+  const pipeTotal = Object.values(data.pipeline).reduce((a,b)=>a+b,0);
+
+  const lines = [
+    `${mrState.client} — ${mrState.month} Monthly Report`,
+    '',
+    `TOTAL ENQUIRIES:  ${totalEnq} (Paid: ${paidEnq}, Organic: ${data.otherEnq})`,
+    `COST PER ENQUIRY: ${cpl}`,
+    `TOTAL AD SPEND:   S$${totalSpend.toFixed(2)} (Meta: S$${data.metaSpend.toFixed(2)}, Google: S$${data.googleSpend.toFixed(2)})`,
+    `PIPELINE TOTAL:   ${pipeTotal} leads`,
+    '',
+    'PIPELINE BREAKDOWN:',
+    ...PIPELINE_STAGES.map(s => `  ${s.label}: ${data.pipeline[s.key]||0}`),
+    '',
+    `Generated ${new Date().toLocaleDateString('en-SG',{day:'numeric',month:'long',year:'numeric'})}`,
+  ];
+
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+
+  const btn = event.target;
+  btn.textContent = 'COPIED'; btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.textContent = 'COPY REPORT TEXT'; btn.style.color = ''; }, 1800);
 }
 
 // ══════════════════════════════════════════════════════════════
