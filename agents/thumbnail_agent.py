@@ -1,10 +1,20 @@
 import anthropic
 
 
-def run(topic: str, script: str) -> dict:
+DEFAULT_CONTEXT = """Brand colours: dark navy (#0A0F2C) and electric cyan (#00D4FF).
+Style: bold split-screen, high contrast, mobile-first.
+No faces — use icons and symbols only. Always include a VS or contrast element."""
+
+
+def run(topic: str, script: str, custom_context: str = "") -> dict:
     client = anthropic.Anthropic()
 
+    context = custom_context.strip() or DEFAULT_CONTEXT
+
     prompt = f"""You are a YouTube thumbnail designer specialising in high-CTR (click-through rate) thumbnails for YouTube Shorts.
+
+AGENT INSTRUCTIONS:
+{context}
 
 TOPIC: {topic}
 SCRIPT HOOK: {script[:300]}

@@ -1,7 +1,13 @@
 import anthropic
 
 
-def run(topic: str, youtube_data: dict) -> dict:
+DEFAULT_CONTEXT = """You are writing for an edtech agency founder audience aged 28-45.
+Brand voice: direct, no fluff, energetic. Use concrete numbers and examples.
+Never use corporate jargon or phrases like 'game-changer' or 'leverage'.
+Always open with a provocative statement or shocking stat."""
+
+
+def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
     client = anthropic.Anthropic()
 
     top_videos = youtube_data["videos"][:5]
@@ -10,7 +16,12 @@ def run(topic: str, youtube_data: dict) -> dict:
         for v in top_videos
     ])
 
+    context = custom_context.strip() or DEFAULT_CONTEXT
+
     prompt = f"""You are an expert YouTube Shorts script writer. Your job is to write a high-performing YouTube Shorts script.
+
+AGENT INSTRUCTIONS:
+{context}
 
 TOPIC: {topic}
 

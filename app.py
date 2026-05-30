@@ -31,7 +31,9 @@ def init_db():
             script TEXT,
             thumbnail TEXT,
             description TEXT,
-            youtube_data TEXT
+            youtube_data TEXT,
+            script_context TEXT,
+            thumbnail_context TEXT
         )
     """)
     con.commit()
@@ -74,7 +76,7 @@ async def send_event(job_id: str, event: str, data: str):
         await _queues[job_id].put(f"event: {event}\ndata: {data}\n\n")
 
 
-async def run_pipeline_async(job_id: str, topic: str):
+async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", thumbnail_context: str = ""):
     from agents import description_agent, script_writer, thumbnail_agent, youtube_research
 
     try:
@@ -86,13 +88,13 @@ async def run_pipeline_async(job_id: str, topic: str):
 
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Writing script..."}))
         db_update(job_id, status="scripting")
-        script_data = await asyncio.to_thread(script_writer.run, topic, yt_data)
+        script_data = await asyncio.to_thread(script_writer.run, topic, yt_data, script_context)
         db_update(job_id, script=script_data["script"])
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Script written", "done": True}))
 
         await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Designing thumbnail concept..."}))
         db_update(job_id, status="thumbnail")
-        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"])
+        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context)
         db_update(job_id, thumbnail=thumb_data["thumbnail_concept"])
         await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Thumbnail concept ready", "done": True}))
 
@@ -137,16 +139,18 @@ async def create_job(request: Request):
     topic = body.get("topic", "").strip()
     if not topic:
         return {"error": "topic required"}
+    script_context = body.get("script_context", "")
+    thumbnail_context = body.get("thumbnail_context", "")
     job_id = str(uuid.uuid4())[:8]
     con = sqlite3.connect(DB)
     con.execute(
-        "INSERT INTO jobs (id, topic, status, created_at) VALUES (?,?,?,?)",
-        (job_id, topic, "queued", datetime.now().isoformat()),
+        "INSERT INTO jobs (id, topic, status, created_at, script_context, thumbnail_context) VALUES (?,?,?,?,?,?)",
+        (job_id, topic, "queued", datetime.now().isoformat(), script_context, thumbnail_context),
     )
     con.commit()
     con.close()
     _queues[job_id] = asyncio.Queue()
-    asyncio.create_task(run_pipeline_async(job_id, topic))
+    asyncio.create_task(run_pipeline_async(job_id, topic, script_context, thumbnail_context))
     return {"job_id": job_id}
 
 
