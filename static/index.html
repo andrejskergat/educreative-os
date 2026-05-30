@@ -201,7 +201,7 @@ function renderJob(job) {
       </div>
       <div class="actions">
         <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
-        ${job.thumbnail_url ? `<a class="action-btn" href="${job.thumbnail_url}" download>Download Thumbnail</a>` : ""}
+        ${job.canva_url ? `<a class="action-btn" href="${escHtml(job.canva_url)}" target="_blank" style="border-color:#7c3aed;color:#c4b5fd;">Open in Canva &#8599;</a>` : ""}
       </div>`;
   }
 

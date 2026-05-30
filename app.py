@@ -35,6 +35,7 @@ def init_db():
             created_at TEXT,
             script TEXT,
             thumbnail TEXT,
+            canva_url TEXT,
             thumbnail_url TEXT,
             description TEXT,
             youtube_data TEXT,
@@ -106,9 +107,8 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", 
         logger.info(f"[{job_id}] Starting thumbnail agent")
         await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Designing thumbnail..."}))
         db_update(job_id, status="thumbnail")
-        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context, job_id)
-        db_update(job_id, thumbnail=thumb_data["thumbnail_concept"], thumbnail_url=thumb_data.get("thumbnail_url"))
-        logger.info(f"[{job_id}] Thumbnail done. Image: {thumb_data.get('thumbnail_url')}")
+        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context)
+        db_update(job_id, thumbnail=thumb_data["thumbnail_concept"], canva_url=thumb_data.get("canva_url", ""))
         await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Thumbnail ready", "done": True}))
 
         logger.info(f"[{job_id}] Starting description agent")
