@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduCreative AI</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f13; color: #e0e0e0; min-height: 100vh; }
+  header { padding: 24px 32px; border-bottom: 1px solid #222; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 20px; font-weight: 600; color: #fff; }
+  header span { font-size: 12px; background: #7c3aed; color: #fff; padding: 2px 8px; border-radius: 999px; }
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+  .input-card { background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 16px; padding: 28px; margin-bottom: 32px; }
+  .input-card h2 { font-size: 15px; color: #aaa; margin-bottom: 16px; font-weight: 500; }
+  textarea { width: 100%; background: #0f0f13; border: 1px solid #333; border-radius: 10px; color: #fff; padding: 14px 16px; font-size: 15px; resize: none; height: 80px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+  textarea:focus { border-color: #7c3aed; }
+  .btn { background: #7c3aed; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 12px; }
+  .btn:hover { background: #6d28d9; }
+  .btn:disabled { background: #444; cursor: not-allowed; }
+  .jobs-title { font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .job-card { background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; }
+  .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .job-topic { font-size: 15px; font-weight: 500; color: #fff; flex: 1; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+  .badge-queued { background: #333; color: #aaa; }
+  .badge-done { background: #14532d; color: #4ade80; }
+  .badge-error { background: #450a0a; color: #f87171; }
+  .badge-running { background: #1e1b4b; color: #a78bfa; }
+  .progress { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .step { font-size: 12px; padding: 4px 10px; border-radius: 6px; background: #111; color: #555; border: 1px solid #222; }
+  .step.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
+  .step.done { background: #14532d; color: #4ade80; border-color: #166534; }
+  .job-meta { font-size: 12px; color: #555; }
+  .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .action-btn { font-size: 12px; padding: 6px 14px; border-radius: 7px; border: 1px solid #333; background: #111; color: #aaa; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .action-btn:hover { border-color: #7c3aed; color: #c4b5fd; }
+  .output-section { margin-top: 16px; border-top: 1px solid #222; padding-top: 16px; }
+  .output-section h4 { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .output-text { font-size: 13px; color: #ccc; white-space: pre-wrap; background: #0f0f13; border-radius: 8px; padding: 12px; border: 1px solid #222; max-height: 200px; overflow-y: auto; line-height: 1.6; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tab { font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #222; background: #111; color: #666; }
+  .tab.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
+  .empty { text-align: center; padding: 48px; color: #444; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>EduCreative AI</h1>
+  <span>YouTube Shorts Pipeline</span>
+</header>
+<div class="container">
+  <div class="input-card">
+    <h2>What do you want to create today?</h2>
+    <textarea id="topicInput" placeholder="e.g. Traditional education business vs AI education business"></textarea>
+    <button class="btn" onclick="submitJob()">Generate Content</button>
+  </div>
+
+  <div class="jobs-title">Recent Jobs</div>
+  <div id="jobsList"></div>
+</div>
+
+<script>
+const STEPS = ["YouTube Research", "Script", "Thumbnail", "Description"];
+const STATUS_STEPS = {
+  queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2
+};
+
+let jobs = {};
+
+async function submitJob() {
+  const topic = document.getElementById("topicInput").value.trim();
+  if (!topic) return;
+  document.querySelector(".btn").disabled = true;
+  const res = await fetch("/jobs", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({topic}) });
+  const data = await res.json();
+  document.getElementById("topicInput").value = "";
+  document.querySelector(".btn").disabled = false;
+  loadJobs();
+  streamJob(data.job_id);
+}
+
+function streamJob(jobId) {
+  const es = new EventSource(`/jobs/${jobId}/stream`);
+  es.addEventListener("progress", e => { updateJobCard(jobId); });
+  es.addEventListener("done", e => { es.close(); updateJobCard(jobId); });
+  es.addEventListener("error", e => { es.close(); updateJobCard(jobId); });
+}
+
+async function loadJobs() {
+  const res = await fetch("/jobs");
+  const data = await res.json();
+  jobs = {};
+  data.forEach(j => jobs[j.id] = j);
+  renderJobs(data);
+}
+
+async function updateJobCard(jobId) {
+  const res = await fetch(`/jobs/${jobId}`);
+  const job = await res.json();
+  jobs[jobId] = job;
+  renderJobs(Object.values(jobs));
+}
+
+function renderJobs(jobList) {
+  const el = document.getElementById("jobsList");
+  if (!jobList.length) { el.innerHTML = '<div class="empty">No jobs yet. Type a topic above to get started.</div>'; return; }
+  el.innerHTML = jobList.map(job => renderJob(job)).join("");
+}
+
+function renderJob(job) {
+  const stepIdx = STATUS_STEPS[job.status] ?? -1;
+  const badgeClass = job.status === "done" ? "badge-done" : job.status === "error" ? "badge-error" : stepIdx >= 0 ? "badge-running" : "badge-queued";
+  const badgeLabel = job.status === "done" ? "Complete" : job.status === "error" ? "Error" : job.status === "queued" ? "Queued" : "Running...";
+  const date = new Date(job.created_at).toLocaleString();
+
+  const steps = STEPS.map((s, i) => {
+    const cls = i < stepIdx ? "done" : i === stepIdx ? "active" : "";
+    return `<div class="step ${cls}">${i < stepIdx ? "✓ " : ""}${s}</div>`;
+  }).join("");
+
+  let outputs = "";
+  if (job.status === "done") {
+    outputs = `
+      <div class="output-section">
+        <div class="tabs">
+          <div class="tab active" onclick="showTab(this,'${job.id}','script')">Script</div>
+          <div class="tab" onclick="showTab(this,'${job.id}','thumbnail')">Thumbnail</div>
+          <div class="tab" onclick="showTab(this,'${job.id}','description')">Description</div>
+        </div>
+        <div id="tab-${job.id}-script" class="output-text">${escHtml(job.script || "")}</div>
+        <div id="tab-${job.id}-thumbnail" class="output-text" style="display:none">${escHtml(job.thumbnail || "")}</div>
+        <div id="tab-${job.id}-description" class="output-text" style="display:none">${escHtml(job.description || "")}</div>
+      </div>
+      <div class="actions">
+        <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
+      </div>`;
+  }
+
+  return `
+    <div class="job-card" id="job-${job.id}">
+      <div class="job-header">
+        <div class="job-topic">${escHtml(job.topic)}</div>
+        <span class="badge ${badgeClass}">${badgeLabel}</span>
+      </div>
+      <div class="progress">${steps}</div>
+      <div class="job-meta">${date} &middot; ID: ${job.id}</div>
+      ${outputs}
+    </div>`;
+}
+
+function showTab(el, jobId, tab) {
+  el.closest('.output-section').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['script','thumbnail','description'].forEach(t => {
+    document.getElementById(`tab-${jobId}-${t}`).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+loadJobs();
+setInterval(loadJobs, 10000);
+</script>
+</body>
+</html>
