@@ -49,6 +49,7 @@
   .agent-setting label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; font-weight: 500; }
   .agent-setting small { font-size: 11px; color: #555; display: block; margin-bottom: 6px; }
   .agent-setting textarea { height: 60px; font-size: 13px; }
+  .thumbnail-img { width: 100%; max-width: 220px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -60,43 +61,36 @@
   <div class="input-card">
     <h2>What do you want to create today?</h2>
     <textarea id="topicInput" placeholder="e.g. Traditional education business vs AI education business"></textarea>
-
     <div class="settings-toggle" onclick="toggleSettings()">
-      <span id="settingsArrow">▶</span> Agent Settings (optional)
+      <span id="settingsArrow">&#9658;</span> Agent Settings (optional)
     </div>
     <div class="settings-panel" id="settingsPanel">
       <div class="agent-setting">
-        <label>Script Writer — Extra Context</label>
+        <label>Script Writer - Extra Context</label>
         <small>Brand voice, audience, hooks to avoid, style preferences</small>
-        <textarea id="scriptContext" placeholder="e.g. Audience: Indian edtech founders 28-45. Use rupee examples. Open with a shocking stat. Never use 'game-changer'."></textarea>
+        <textarea id="scriptContext" placeholder="e.g. Audience: edtech founders 28-45. Open with a shocking stat. Never use 'game-changer'."></textarea>
       </div>
       <div class="agent-setting">
-        <label>Thumbnail Designer — Extra Context</label>
+        <label>Thumbnail Designer - Extra Context</label>
         <small>Brand colours, style, fonts, examples to follow or avoid</small>
-        <textarea id="thumbnailContext" placeholder="e.g. Brand colours: purple #7c3aed and white. Bold sans-serif font. Always split-screen layout. No text clutter."></textarea>
+        <textarea id="thumbnailContext" placeholder="e.g. Brand colours: purple #7c3aed and white. Bold sans-serif. Always split-screen."></textarea>
       </div>
     </div>
-
     <button class="btn" onclick="submitJob()">Generate Content</button>
   </div>
-
   <div class="jobs-title">Recent Jobs</div>
   <div id="jobsList"></div>
 </div>
-
 <script>
 const STEPS = ["YouTube Research", "Script", "Thumbnail", "Description"];
-const STATUS_STEPS = {
-  queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2
-};
-
+const STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2 };
 let jobs = {};
 
 function toggleSettings() {
   const panel = document.getElementById("settingsPanel");
   const arrow = document.getElementById("settingsArrow");
   panel.classList.toggle("open");
-  arrow.textContent = panel.classList.contains("open") ? "▼" : "▶";
+  arrow.innerHTML = panel.classList.contains("open") ? "&#9660;" : "&#9658;";
 }
 
 async function submitJob() {
@@ -115,9 +109,9 @@ async function submitJob() {
 
 function streamJob(jobId) {
   const es = new EventSource(`/jobs/${jobId}/stream`);
-  es.addEventListener("progress", e => { updateJobCard(jobId); });
-  es.addEventListener("done", e => { es.close(); updateJobCard(jobId); });
-  es.addEventListener("error", e => { es.close(); updateJobCard(jobId); });
+  es.addEventListener("progress", () => updateJobCard(jobId));
+  es.addEventListener("done", () => { es.close(); updateJobCard(jobId); });
+  es.addEventListener("error", () => { es.close(); updateJobCard(jobId); });
 }
 
 async function loadJobs() {
@@ -138,7 +132,7 @@ async function updateJobCard(jobId) {
 function renderJobs(jobList) {
   const el = document.getElementById("jobsList");
   if (!jobList.length) { el.innerHTML = '<div class="empty">No jobs yet. Type a topic above to get started.</div>'; return; }
-  el.innerHTML = jobList.map(job => renderJob(job)).join("");
+  el.innerHTML = jobList.map(renderJob).join("");
 }
 
 function renderJob(job) {
@@ -146,14 +140,15 @@ function renderJob(job) {
   const badgeClass = job.status === "done" ? "badge-done" : job.status === "error" ? "badge-error" : stepIdx >= 0 ? "badge-running" : "badge-queued";
   const badgeLabel = job.status === "done" ? "Complete" : job.status === "error" ? "Error" : job.status === "queued" ? "Queued" : "Running...";
   const date = new Date(job.created_at).toLocaleString();
-
   const steps = STEPS.map((s, i) => {
     const cls = i < stepIdx ? "done" : i === stepIdx ? "active" : "";
-    return `<div class="step ${cls}">${i < stepIdx ? "✓ " : ""}${s}</div>`;
+    return `<div class="step ${cls}">${i < stepIdx ? "&#10003; " : ""}${s}</div>`;
   }).join("");
 
   let outputs = "";
   if (job.status === "done") {
+    const thumbImg = job.thumbnail_url
+      ? `<img src="${job.thumbnail_url}" class="thumbnail-img" alt="Thumbnail" /><br>` : "";
     outputs = `
       <div class="output-section">
         <div class="tabs">
@@ -162,24 +157,21 @@ function renderJob(job) {
           <div class="tab" onclick="showTab(this,'${job.id}','description')">Description</div>
         </div>
         <div id="tab-${job.id}-script" class="output-text">${escHtml(job.script || "")}</div>
-        <div id="tab-${job.id}-thumbnail" class="output-text" style="display:none">${escHtml(job.thumbnail || "")}</div>
+        <div id="tab-${job.id}-thumbnail" style="display:none">${thumbImg}<div class="output-text">${escHtml(job.thumbnail || "")}</div></div>
         <div id="tab-${job.id}-description" class="output-text" style="display:none">${escHtml(job.description || "")}</div>
       </div>
       <div class="actions">
         <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
+        ${job.thumbnail_url ? `<a class="action-btn" href="${job.thumbnail_url}" download>Download Thumbnail</a>` : ""}
       </div>`;
   }
 
-  return `
-    <div class="job-card" id="job-${job.id}">
-      <div class="job-header">
-        <div class="job-topic">${escHtml(job.topic)}</div>
-        <span class="badge ${badgeClass}">${badgeLabel}</span>
-      </div>
-      <div class="progress">${steps}</div>
-      <div class="job-meta">${date} &middot; ID: ${job.id}</div>
-      ${outputs}
-    </div>`;
+  return `<div class="job-card" id="job-${job.id}">
+    <div class="job-header"><div class="job-topic">${escHtml(job.topic)}</div><span class="badge ${badgeClass}">${badgeLabel}</span></div>
+    <div class="progress">${steps}</div>
+    <div class="job-meta">${date} &middot; ID: ${job.id}</div>
+    ${outputs}
+  </div>`;
 }
 
 function showTab(el, jobId, tab) {

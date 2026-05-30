@@ -35,6 +35,7 @@ def init_db():
             created_at TEXT,
             script TEXT,
             thumbnail TEXT,
+            thumbnail_url TEXT,
             description TEXT,
             youtube_data TEXT,
             script_context TEXT,
@@ -103,12 +104,12 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", 
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Script written", "done": True}))
 
         logger.info(f"[{job_id}] Starting thumbnail agent")
-        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Designing thumbnail concept..."}))
+        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Designing thumbnail..."}))
         db_update(job_id, status="thumbnail")
-        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context)
-        db_update(job_id, thumbnail=thumb_data["thumbnail_concept"])
-        logger.info(f"[{job_id}] Thumbnail done.")
-        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Thumbnail concept ready", "done": True}))
+        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context, job_id)
+        db_update(job_id, thumbnail=thumb_data["thumbnail_concept"], thumbnail_url=thumb_data.get("thumbnail_url"))
+        logger.info(f"[{job_id}] Thumbnail done. Image: {thumb_data.get('thumbnail_url')}")
+        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Thumbnail ready", "done": True}))
 
         logger.info(f"[{job_id}] Starting description agent")
         await send_event(job_id, "progress", json.dumps({"step": 4, "msg": "Writing description & hashtags..."}))
@@ -120,7 +121,7 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", 
 
         output_path = Path("outputs") / f"{job_id}.txt"
         job = db_get(job_id)
-        with open(output_path, "w") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(f"TOPIC: {topic}\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n")
             f.write("=" * 60 + "\nSCRIPT\n" + "=" * 60 + "\n")
