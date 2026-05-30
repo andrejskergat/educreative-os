@@ -1,7 +1,9 @@
 import asyncio
 import json
+import logging
 import os
 import sqlite3
+import traceback
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -12,6 +14,9 @@ from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -33,7 +38,8 @@ def init_db():
             description TEXT,
             youtube_data TEXT,
             script_context TEXT,
-            thumbnail_context TEXT
+            thumbnail_context TEXT,
+            error TEXT
         )
     """)
     con.commit()
@@ -80,28 +86,36 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", 
     from agents import description_agent, script_writer, thumbnail_agent, youtube_research
 
     try:
+        logger.info(f"[{job_id}] Starting YouTube research for: {topic}")
         await send_event(job_id, "progress", json.dumps({"step": 1, "msg": "Running YouTube Research..."}))
         db_update(job_id, status="researching")
         yt_data = await asyncio.to_thread(youtube_research.run, topic)
         db_update(job_id, youtube_data=json.dumps(yt_data))
+        logger.info(f"[{job_id}] YouTube research done. {len(yt_data['videos'])} videos found.")
         await send_event(job_id, "progress", json.dumps({"step": 1, "msg": f"Found {len(yt_data['videos'])} videos", "done": True}))
 
+        logger.info(f"[{job_id}] Starting script writer")
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Writing script..."}))
         db_update(job_id, status="scripting")
         script_data = await asyncio.to_thread(script_writer.run, topic, yt_data, script_context)
         db_update(job_id, script=script_data["script"])
+        logger.info(f"[{job_id}] Script done.")
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Script written", "done": True}))
 
+        logger.info(f"[{job_id}] Starting thumbnail agent")
         await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Designing thumbnail concept..."}))
         db_update(job_id, status="thumbnail")
         thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context)
         db_update(job_id, thumbnail=thumb_data["thumbnail_concept"])
+        logger.info(f"[{job_id}] Thumbnail done.")
         await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Thumbnail concept ready", "done": True}))
 
+        logger.info(f"[{job_id}] Starting description agent")
         await send_event(job_id, "progress", json.dumps({"step": 4, "msg": "Writing description & hashtags..."}))
         db_update(job_id, status="description")
         desc_data = await asyncio.to_thread(description_agent.run, topic, script_data["script"])
         db_update(job_id, description=desc_data["description"])
+        logger.info(f"[{job_id}] Description done.")
         await send_event(job_id, "progress", json.dumps({"step": 4, "msg": "Description ready", "done": True}))
 
         output_path = Path("outputs") / f"{job_id}.txt"
@@ -117,10 +131,13 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", 
             f.write(job["description"] + "\n")
 
         db_update(job_id, status="done")
+        logger.info(f"[{job_id}] Pipeline complete.")
         await send_event(job_id, "done", json.dumps({"job_id": job_id}))
 
     except Exception as e:
-        db_update(job_id, status="error")
+        error_msg = traceback.format_exc()
+        logger.error(f"[{job_id}] Pipeline failed: {error_msg}")
+        db_update(job_id, status="error", error=str(e))
         await send_event(job_id, "error", json.dumps({"msg": str(e)}))
     finally:
         await asyncio.sleep(5)
