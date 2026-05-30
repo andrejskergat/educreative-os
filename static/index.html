@@ -36,7 +36,7 @@
   .action-btn { font-size: 12px; padding: 6px 14px; border-radius: 7px; border: 1px solid #333; background: #111; color: #aaa; cursor: pointer; text-decoration: none; transition: all 0.2s; }
   .action-btn:hover { border-color: #7c3aed; color: #c4b5fd; }
   .output-section { margin-top: 16px; border-top: 1px solid #222; padding-top: 16px; }
-  .output-text { font-size: 13px; color: #ccc; white-space: pre-wrap; background: #0f0f13; border-radius: 8px; padding: 12px; border: 1px solid #222; max-height: 200px; overflow-y: auto; line-height: 1.6; }
+  .output-text { font-size: 13px; color: #ccc; white-space: pre-wrap; background: #0f0f13; border-radius: 8px; padding: 12px; border: 1px solid #222; max-height: 400px; overflow-y: auto; line-height: 1.6; user-select: text; cursor: text; }
   .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
   .tab { font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #222; background: #111; color: #666; }
   .tab.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
@@ -49,7 +49,10 @@
   .agent-setting label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; font-weight: 500; }
   .agent-setting small { font-size: 11px; color: #555; display: block; margin-bottom: 6px; }
   .agent-setting textarea { height: 60px; font-size: 13px; }
-  .thumbnail-img { width: 100%; max-width: 220px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px; }
+  .thumbnail-img { width: 100%; max-width: 220px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px; display: block; }
+  .copy-btn { font-size: 11px; padding: 3px 10px; border-radius: 5px; border: 1px solid #333; background: #111; color: #888; cursor: pointer; float: right; margin-bottom: 6px; }
+  .copy-btn:hover { border-color: #7c3aed; color: #c4b5fd; }
+  .copy-btn.copied { border-color: #166534; color: #4ade80; }
 </style>
 </head>
 <body>
@@ -81,10 +84,12 @@
   <div class="jobs-title">Recent Jobs</div>
   <div id="jobsList"></div>
 </div>
+
 <script>
 const STEPS = ["YouTube Research", "Script", "Thumbnail", "Description"];
 const STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2 };
 let jobs = {};
+let activeStreams = new Set();
 
 function toggleSettings() {
   const panel = document.getElementById("settingsPanel");
@@ -103,22 +108,31 @@ async function submitJob() {
   const data = await res.json();
   document.getElementById("topicInput").value = "";
   document.querySelector(".btn").disabled = false;
-  loadJobs();
+  const job = await (await fetch(`/jobs/${data.job_id}`)).json();
+  jobs[job.id] = job;
+  renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
   streamJob(data.job_id);
 }
 
 function streamJob(jobId) {
+  if (activeStreams.has(jobId)) return;
+  activeStreams.add(jobId);
   const es = new EventSource(`/jobs/${jobId}/stream`);
   es.addEventListener("progress", () => updateJobCard(jobId));
-  es.addEventListener("done", () => { es.close(); updateJobCard(jobId); });
-  es.addEventListener("error", () => { es.close(); updateJobCard(jobId); });
+  es.addEventListener("done", () => { es.close(); activeStreams.delete(jobId); updateJobCard(jobId); });
+  es.addEventListener("error", () => { es.close(); activeStreams.delete(jobId); updateJobCard(jobId); });
 }
 
 async function loadJobs() {
   const res = await fetch("/jobs");
   const data = await res.json();
-  jobs = {};
-  data.forEach(j => jobs[j.id] = j);
+  // Only update cards that are not done — avoid disturbing completed ones user is reading
+  data.forEach(j => {
+    if (!jobs[j.id] || jobs[j.id].status !== "done") {
+      jobs[j.id] = j;
+      if (j.status !== "done" && j.status !== "error") streamJob(j.id);
+    }
+  });
   renderJobs(data);
 }
 
@@ -126,13 +140,29 @@ async function updateJobCard(jobId) {
   const res = await fetch(`/jobs/${jobId}`);
   const job = await res.json();
   jobs[jobId] = job;
-  renderJobs(Object.values(jobs));
+  const el = document.getElementById(`job-${jobId}`);
+  if (el) {
+    const scroll = window.scrollY;
+    el.outerHTML = renderJob(job);
+    window.scrollTo(0, scroll);
+  }
 }
 
 function renderJobs(jobList) {
   const el = document.getElementById("jobsList");
+  const scroll = window.scrollY;
   if (!jobList.length) { el.innerHTML = '<div class="empty">No jobs yet. Type a topic above to get started.</div>'; return; }
   el.innerHTML = jobList.map(renderJob).join("");
+  window.scrollTo(0, scroll);
+}
+
+function copyText(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+  });
 }
 
 function renderJob(job) {
@@ -147,8 +177,7 @@ function renderJob(job) {
 
   let outputs = "";
   if (job.status === "done") {
-    const thumbImg = job.thumbnail_url
-      ? `<img src="${job.thumbnail_url}" class="thumbnail-img" alt="Thumbnail" /><br>` : "";
+    const thumbImg = job.thumbnail_url ? `<img src="${job.thumbnail_url}" class="thumbnail-img" alt="Thumbnail" /><br>` : "";
     outputs = `
       <div class="output-section">
         <div class="tabs">
@@ -156,9 +185,19 @@ function renderJob(job) {
           <div class="tab" onclick="showTab(this,'${job.id}','thumbnail')">Thumbnail</div>
           <div class="tab" onclick="showTab(this,'${job.id}','description')">Description</div>
         </div>
-        <div id="tab-${job.id}-script" class="output-text">${escHtml(job.script || "")}</div>
-        <div id="tab-${job.id}-thumbnail" style="display:none">${thumbImg}<div class="output-text">${escHtml(job.thumbnail || "")}</div></div>
-        <div id="tab-${job.id}-description" class="output-text" style="display:none">${escHtml(job.description || "")}</div>
+        <div id="tab-${job.id}-script">
+          <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
+          <div id="script-text-${job.id}" class="output-text">${escHtml(job.script || "")}</div>
+        </div>
+        <div id="tab-${job.id}-thumbnail" style="display:none">
+          ${thumbImg}
+          <button class="copy-btn" onclick="copyText('thumb-text-${job.id}', this)">Copy</button>
+          <div id="thumb-text-${job.id}" class="output-text">${escHtml(job.thumbnail || "")}</div>
+        </div>
+        <div id="tab-${job.id}-description" style="display:none">
+          <button class="copy-btn" onclick="copyText('desc-text-${job.id}', this)">Copy</button>
+          <div id="desc-text-${job.id}" class="output-text">${escHtml(job.description || "")}</div>
+        </div>
       </div>
       <div class="actions">
         <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
@@ -183,11 +222,15 @@ function showTab(el, jobId, tab) {
 }
 
 function escHtml(str) {
-  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return (str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 loadJobs();
-setInterval(loadJobs, 10000);
+// Only poll for running jobs, not on a fixed interval that disrupts reading
+setInterval(() => {
+  const hasRunning = Object.values(jobs).some(j => j.status !== "done" && j.status !== "error");
+  if (hasRunning) loadJobs();
+}, 3000);
 </script>
 </body>
 </html>
