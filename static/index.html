@@ -11,17 +11,31 @@
   header h1 { font-size: 20px; font-weight: 600; color: #fff; }
   header span { font-size: 12px; background: #7c3aed; color: #fff; padding: 2px 8px; border-radius: 999px; }
   .container { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+  .page-tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid #222; padding-bottom: 0; }
+  .page-tab { font-size: 14px; font-weight: 500; padding: 10px 20px; cursor: pointer; border-radius: 8px 8px 0 0; color: #666; border: 1px solid transparent; border-bottom: none; margin-bottom: -1px; transition: all 0.2s; }
+  .page-tab.active { background: #1a1a24; color: #fff; border-color: #2a2a3a; }
+  .page-tab:hover:not(.active) { color: #aaa; }
+  .page { display: none; }
+  .page.active { display: block; }
   .input-card { background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 16px; padding: 28px; margin-bottom: 32px; }
   .input-card h2 { font-size: 15px; color: #aaa; margin-bottom: 16px; font-weight: 500; }
+  .form-row { display: flex; gap: 12px; margin-bottom: 0; }
+  .form-row textarea { flex: 1; }
+  .platform-select { background: #0f0f13; border: 1px solid #333; border-radius: 10px; color: #fff; padding: 14px 16px; font-size: 15px; font-family: inherit; outline: none; cursor: pointer; transition: border-color 0.2s; min-width: 130px; }
+  .platform-select:focus { border-color: #00D4FF; }
   textarea { width: 100%; background: #0f0f13; border: 1px solid #333; border-radius: 10px; color: #fff; padding: 14px 16px; font-size: 15px; resize: none; height: 80px; font-family: inherit; outline: none; transition: border-color 0.2s; }
   textarea:focus { border-color: #7c3aed; }
+  .ad-page textarea:focus { border-color: #00D4FF; }
   .btn { background: #7c3aed; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 12px; }
   .btn:hover { background: #6d28d9; }
   .btn:disabled { background: #444; cursor: not-allowed; }
+  .btn-ad { background: #0369a1; }
+  .btn-ad:hover { background: #0284c7; }
   .jobs-title { font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
   .job-card { background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; }
   .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
   .job-topic { font-size: 15px; font-weight: 500; color: #fff; flex: 1; }
+  .job-platform { font-size: 11px; color: #00D4FF; background: #0c1a26; border: 1px solid #0369a1; padding: 2px 8px; border-radius: 999px; margin-right: 8px; white-space: nowrap; }
   .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
   .badge-queued { background: #333; color: #aaa; }
   .badge-done { background: #14532d; color: #4ade80; }
@@ -31,6 +45,7 @@
   .step { font-size: 12px; padding: 4px 10px; border-radius: 6px; background: #111; color: #555; border: 1px solid #222; }
   .step.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
   .step.done { background: #14532d; color: #4ade80; border-color: #166534; }
+  .step.active-ad { background: #0c1a26; color: #38bdf8; border-color: #0369a1; }
   .job-meta { font-size: 12px; color: #555; }
   .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   .action-btn { font-size: 12px; padding: 6px 14px; border-radius: 7px; border: 1px solid #333; background: #111; color: #aaa; cursor: pointer; text-decoration: none; transition: all 0.2s; }
@@ -40,6 +55,7 @@
   .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
   .tab { font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #222; background: #111; color: #666; }
   .tab.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
+  .tab.active-ad { background: #0c1a26; color: #38bdf8; border-color: #0369a1; }
   .empty { text-align: center; padding: 48px; color: #444; font-size: 14px; }
   .settings-toggle { font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-top: 16px; user-select: none; }
   .settings-toggle:hover { color: #a78bfa; }
@@ -53,43 +69,106 @@
   .copy-btn { font-size: 11px; padding: 3px 10px; border-radius: 5px; border: 1px solid #333; background: #111; color: #888; cursor: pointer; float: right; margin-bottom: 6px; }
   .copy-btn:hover { border-color: #7c3aed; color: #c4b5fd; }
   .copy-btn.copied { border-color: #166534; color: #4ade80; }
+  .pipeline-info { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pipeline-step { font-size: 12px; padding: 6px 14px; border-radius: 8px; border: 1px solid #1a3a4a; background: #0c1a26; color: #38bdf8; }
+  .pipeline-step span { color: #555; margin-right: 6px; }
 </style>
 </head>
 <body>
 <header>
   <h1>EduCreative AI</h1>
-  <span>YouTube Shorts Pipeline</span>
+  <span>Content & Ads Pipeline</span>
 </header>
 <div class="container">
-  <div class="input-card">
-    <h2>What do you want to create today?</h2>
-    <textarea id="topicInput" placeholder="e.g. Traditional education business vs AI education business"></textarea>
-    <div class="settings-toggle" onclick="toggleSettings()">
-      <span id="settingsArrow">&#9658;</span> Agent Settings (optional)
-    </div>
-    <div class="settings-panel" id="settingsPanel">
-      <div class="agent-setting">
-        <label>Script Writer - Extra Context</label>
-        <small>Brand voice, audience, hooks to avoid, style preferences</small>
-        <textarea id="scriptContext" placeholder="e.g. Audience: edtech founders 28-45. Open with a shocking stat. Never use 'game-changer'."></textarea>
-      </div>
-      <div class="agent-setting">
-        <label>Thumbnail Designer - Extra Context</label>
-        <small>Brand colours, style, fonts, examples to follow or avoid</small>
-        <textarea id="thumbnailContext" placeholder="e.g. Brand colours: purple #7c3aed and white. Bold sans-serif. Always split-screen."></textarea>
-      </div>
-    </div>
-    <button class="btn" onclick="submitJob()">Generate Content</button>
+  <div class="page-tabs">
+    <div class="page-tab active" onclick="switchPage('youtube')">YouTube Shorts</div>
+    <div class="page-tab" onclick="switchPage('ads')">Ad Creator</div>
   </div>
-  <div class="jobs-title">Recent Jobs</div>
-  <div id="jobsList"></div>
+
+  <!-- YouTube Shorts Page -->
+  <div class="page active" id="page-youtube">
+    <div class="input-card">
+      <h2>What do you want to create today?</h2>
+      <textarea id="topicInput" placeholder="e.g. Traditional education business vs AI education business"></textarea>
+      <div class="settings-toggle" onclick="toggleSettings()">
+        <span id="settingsArrow">&#9658;</span> Agent Settings (optional)
+      </div>
+      <div class="settings-panel" id="settingsPanel">
+        <div class="agent-setting">
+          <label>Script Writer - Extra Context</label>
+          <small>Brand voice, audience, hooks to avoid, style preferences</small>
+          <textarea id="scriptContext" placeholder="e.g. Audience: edtech founders 28-45. Open with a shocking stat. Never use 'game-changer'."></textarea>
+        </div>
+        <div class="agent-setting">
+          <label>Thumbnail Designer - Extra Context</label>
+          <small>Brand colours, style, fonts, examples to follow or avoid</small>
+          <textarea id="thumbnailContext" placeholder="e.g. Brand colours: purple #7c3aed and white. Bold sans-serif. Always split-screen."></textarea>
+        </div>
+      </div>
+      <button class="btn" onclick="submitJob()">Generate Content</button>
+    </div>
+    <div class="jobs-title">Recent Jobs</div>
+    <div id="jobsList"></div>
+  </div>
+
+  <!-- Ad Creator Page -->
+  <div class="page ad-page" id="page-ads">
+    <div class="input-card">
+      <h2>What are you advertising?</h2>
+      <div class="pipeline-info">
+        <div class="pipeline-step"><span>1</span>Research &amp; Angles</div>
+        <div class="pipeline-step"><span>2</span>3 Copy Variants</div>
+        <div class="pipeline-step"><span>3</span>Creative Concepts</div>
+        <div class="pipeline-step"><span>4</span>Audience Brief</div>
+      </div>
+      <div class="form-row">
+        <textarea id="productInput" placeholder="e.g. AI curriculum builder for edtech agencies" style="height:80px;"></textarea>
+        <select class="platform-select" id="platformSelect">
+          <option value="Meta">Meta (FB/IG)</option>
+          <option value="Google">Google Ads</option>
+          <option value="TikTok">TikTok Ads</option>
+          <option value="LinkedIn">LinkedIn Ads</option>
+          <option value="YouTube">YouTube Ads</option>
+        </select>
+      </div>
+      <div class="settings-toggle" onclick="toggleAdSettings()">
+        <span id="adSettingsArrow">&#9658;</span> Agent Settings (optional)
+      </div>
+      <div class="settings-panel" id="adSettingsPanel">
+        <div class="agent-setting">
+          <label>Copy Writer - Extra Context</label>
+          <small>Brand voice, offer details, pricing, guarantees, tone</small>
+          <textarea id="copyContext" placeholder="e.g. Offer: 14-day free trial. Price: $297/mo. Tone: confident but not aggressive."></textarea>
+        </div>
+        <div class="agent-setting">
+          <label>Creative Director - Extra Context</label>
+          <small>Brand colours, style preferences, visual dos and don'ts</small>
+          <textarea id="creativeContext" placeholder="e.g. Brand colours: navy #0A0F2C + cyan #00D4FF. No faces. Bold typography."></textarea>
+        </div>
+      </div>
+      <button class="btn btn-ad" onclick="submitAdJob()">Generate Ad Package</button>
+    </div>
+    <div class="jobs-title">Recent Ad Jobs</div>
+    <div id="adJobsList"></div>
+  </div>
 </div>
 
 <script>
-const STEPS = ["YouTube Research", "Script", "Thumbnail", "Description"];
-const STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2 };
+// ── Shared ────────────────────────────────────────────────────────────────────
+const YT_STEPS = ["YouTube Research", "Script", "Thumbnail", "Description"];
+const YT_STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2 };
+const AD_STEPS = ["Research & Angles", "Copy Variants", "Creative Concepts", "Audience Brief"];
+const AD_STATUS_STEPS = { queued: -1, researching: 0, copywriting: 1, creative: 2, audience: 3, done: 4, error: -2 };
+
 let jobs = {};
+let adJobs = {};
 let activeStreams = new Set();
+
+function switchPage(page) {
+  document.querySelectorAll('.page-tab').forEach((t, i) => t.classList.toggle('active', (i === 0 && page === 'youtube') || (i === 1 && page === 'ads')));
+  document.getElementById('page-youtube').classList.toggle('active', page === 'youtube');
+  document.getElementById('page-ads').classList.toggle('active', page === 'ads');
+}
 
 function toggleSettings() {
   const panel = document.getElementById("settingsPanel");
@@ -98,62 +177,15 @@ function toggleSettings() {
   arrow.innerHTML = panel.classList.contains("open") ? "&#9660;" : "&#9658;";
 }
 
-async function submitJob() {
-  const topic = document.getElementById("topicInput").value.trim();
-  if (!topic) return;
-  const script_context = document.getElementById("scriptContext").value.trim();
-  const thumbnail_context = document.getElementById("thumbnailContext").value.trim();
-  document.querySelector(".btn").disabled = true;
-  const res = await fetch("/jobs", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({topic, script_context, thumbnail_context}) });
-  const data = await res.json();
-  document.getElementById("topicInput").value = "";
-  document.querySelector(".btn").disabled = false;
-  const job = await (await fetch(`/jobs/${data.job_id}`)).json();
-  jobs[job.id] = job;
-  renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
-  streamJob(data.job_id);
+function toggleAdSettings() {
+  const panel = document.getElementById("adSettingsPanel");
+  const arrow = document.getElementById("adSettingsArrow");
+  panel.classList.toggle("open");
+  arrow.innerHTML = panel.classList.contains("open") ? "&#9660;" : "&#9658;";
 }
 
-function streamJob(jobId) {
-  if (activeStreams.has(jobId)) return;
-  activeStreams.add(jobId);
-  const es = new EventSource(`/jobs/${jobId}/stream`);
-  es.addEventListener("progress", () => updateJobCard(jobId));
-  es.addEventListener("done", () => { es.close(); activeStreams.delete(jobId); updateJobCard(jobId); });
-  es.addEventListener("error", () => { es.close(); activeStreams.delete(jobId); updateJobCard(jobId); });
-}
-
-async function loadJobs() {
-  const res = await fetch("/jobs");
-  const data = await res.json();
-  // Only update cards that are not done — avoid disturbing completed ones user is reading
-  data.forEach(j => {
-    if (!jobs[j.id] || jobs[j.id].status !== "done") {
-      jobs[j.id] = j;
-      if (j.status !== "done" && j.status !== "error") streamJob(j.id);
-    }
-  });
-  renderJobs(data);
-}
-
-async function updateJobCard(jobId) {
-  const res = await fetch(`/jobs/${jobId}`);
-  const job = await res.json();
-  jobs[jobId] = job;
-  const el = document.getElementById(`job-${jobId}`);
-  if (el) {
-    const scroll = window.scrollY;
-    el.outerHTML = renderJob(job);
-    window.scrollTo(0, scroll);
-  }
-}
-
-function renderJobs(jobList) {
-  const el = document.getElementById("jobsList");
-  const scroll = window.scrollY;
-  if (!jobList.length) { el.innerHTML = '<div class="empty">No jobs yet. Type a topic above to get started.</div>'; return; }
-  el.innerHTML = jobList.map(renderJob).join("");
-  window.scrollTo(0, scroll);
+function escHtml(str) {
+  return (str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 function copyText(id, btn) {
@@ -165,12 +197,74 @@ function copyText(id, btn) {
   });
 }
 
+// ── YouTube Pipeline ──────────────────────────────────────────────────────────
+async function submitJob() {
+  const topic = document.getElementById("topicInput").value.trim();
+  if (!topic) return;
+  const script_context = document.getElementById("scriptContext").value.trim();
+  const thumbnail_context = document.getElementById("thumbnailContext").value.trim();
+  document.querySelector("#page-youtube .btn").disabled = true;
+  const res = await fetch("/jobs", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({topic, script_context, thumbnail_context}) });
+  const data = await res.json();
+  document.getElementById("topicInput").value = "";
+  document.querySelector("#page-youtube .btn").disabled = false;
+  const job = await (await fetch(`/jobs/${data.job_id}`)).json();
+  jobs[job.id] = job;
+  renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
+  streamJob(data.job_id, "yt");
+}
+
+function streamJob(jobId, type) {
+  const key = `${type}-${jobId}`;
+  if (activeStreams.has(key)) return;
+  activeStreams.add(key);
+  const endpoint = type === "ad" ? `/ad-jobs/${jobId}/stream` : `/jobs/${jobId}/stream`;
+  const es = new EventSource(endpoint);
+  es.addEventListener("progress", () => type === "ad" ? updateAdJobCard(jobId) : updateJobCard(jobId));
+  es.addEventListener("done", () => { es.close(); activeStreams.delete(key); type === "ad" ? updateAdJobCard(jobId) : updateJobCard(jobId); });
+  es.addEventListener("error", () => { es.close(); activeStreams.delete(key); type === "ad" ? updateAdJobCard(jobId) : updateJobCard(jobId); });
+}
+
+async function loadJobs() {
+  const res = await fetch("/jobs");
+  const data = await res.json();
+  data.forEach(j => {
+    if (!jobs[j.id] || jobs[j.id].status !== "done") {
+      jobs[j.id] = j;
+      if (j.status !== "done" && j.status !== "error") streamJob(j.id, "yt");
+    }
+  });
+  renderJobs(data);
+}
+
+async function updateJobCard(jobId) {
+  const res = await fetch(`/jobs/${jobId}`);
+  const job = await res.json();
+  jobs[jobId] = job;
+  const el = document.getElementById(`job-${jobId}`);
+  if (el) { const s = window.scrollY; el.outerHTML = renderJob(job); window.scrollTo(0,s); }
+}
+
+function renderJobs(jobList) {
+  const el = document.getElementById("jobsList");
+  const s = window.scrollY;
+  if (!jobList.length) { el.innerHTML = '<div class="empty">No jobs yet. Type a topic above to get started.</div>'; return; }
+  el.innerHTML = jobList.map(renderJob).join("");
+  window.scrollTo(0, s);
+}
+
+function showTab(el, jobId, tab, tabs) {
+  el.closest('.output-section').querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.classList.remove('active-ad'); });
+  el.classList.add(tabs.includes('copy') ? 'active-ad' : 'active');
+  tabs.forEach(t => { document.getElementById(`tab-${jobId}-${t}`).style.display = t === tab ? 'block' : 'none'; });
+}
+
 function renderJob(job) {
-  const stepIdx = STATUS_STEPS[job.status] ?? -1;
+  const stepIdx = YT_STATUS_STEPS[job.status] ?? -1;
   const badgeClass = job.status === "done" ? "badge-done" : job.status === "error" ? "badge-error" : stepIdx >= 0 ? "badge-running" : "badge-queued";
   const badgeLabel = job.status === "done" ? "Complete" : job.status === "error" ? "Error" : job.status === "queued" ? "Queued" : "Running...";
   const date = new Date(job.created_at).toLocaleString();
-  const steps = STEPS.map((s, i) => {
+  const steps = YT_STEPS.map((s, i) => {
     const cls = i < stepIdx ? "done" : i === stepIdx ? "active" : "";
     return `<div class="step ${cls}">${i < stepIdx ? "&#10003; " : ""}${s}</div>`;
   }).join("");
@@ -181,9 +275,9 @@ function renderJob(job) {
     outputs = `
       <div class="output-section">
         <div class="tabs">
-          <div class="tab active" onclick="showTab(this,'${job.id}','script')">Script</div>
-          <div class="tab" onclick="showTab(this,'${job.id}','thumbnail')">Thumbnail</div>
-          <div class="tab" onclick="showTab(this,'${job.id}','description')">Description</div>
+          <div class="tab active" onclick="showTab(this,'${job.id}','script',['script','thumbnail','description'])">Script</div>
+          <div class="tab" onclick="showTab(this,'${job.id}','thumbnail',['script','thumbnail','description'])">Thumbnail</div>
+          <div class="tab" onclick="showTab(this,'${job.id}','description',['script','thumbnail','description'])">Description</div>
         </div>
         <div id="tab-${job.id}-script">
           <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
@@ -213,23 +307,118 @@ function renderJob(job) {
   </div>`;
 }
 
-function showTab(el, jobId, tab) {
-  el.closest('.output-section').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  ['script','thumbnail','description'].forEach(t => {
-    document.getElementById(`tab-${jobId}-${t}`).style.display = t === tab ? 'block' : 'none';
+// ── Ad Pipeline ───────────────────────────────────────────────────────────────
+async function submitAdJob() {
+  const product = document.getElementById("productInput").value.trim();
+  if (!product) return;
+  const platform = document.getElementById("platformSelect").value;
+  const copy_context = document.getElementById("copyContext").value.trim();
+  const creative_context = document.getElementById("creativeContext").value.trim();
+  document.querySelector(".btn-ad").disabled = true;
+  const res = await fetch("/ad-jobs", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({product, platform, copy_context, creative_context}) });
+  const data = await res.json();
+  document.getElementById("productInput").value = "";
+  document.querySelector(".btn-ad").disabled = false;
+  const job = await (await fetch(`/ad-jobs/${data.job_id}`)).json();
+  adJobs[job.id] = job;
+  renderAdJobs(Object.values(adJobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
+  streamJob(data.job_id, "ad");
+}
+
+async function loadAdJobs() {
+  const res = await fetch("/ad-jobs");
+  const data = await res.json();
+  data.forEach(j => {
+    if (!adJobs[j.id] || adJobs[j.id].status !== "done") {
+      adJobs[j.id] = j;
+      if (j.status !== "done" && j.status !== "error") streamJob(j.id, "ad");
+    }
   });
+  renderAdJobs(data);
 }
 
-function escHtml(str) {
-  return (str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+async function updateAdJobCard(jobId) {
+  const res = await fetch(`/ad-jobs/${jobId}`);
+  const job = await res.json();
+  adJobs[jobId] = job;
+  const el = document.getElementById(`ad-job-${jobId}`);
+  if (el) { const s = window.scrollY; el.outerHTML = renderAdJob(job); window.scrollTo(0,s); }
 }
 
+function renderAdJobs(jobList) {
+  const el = document.getElementById("adJobsList");
+  const s = window.scrollY;
+  if (!jobList.length) { el.innerHTML = '<div class="empty">No ad jobs yet. Describe your product above to generate a full ad package.</div>'; return; }
+  el.innerHTML = jobList.map(renderAdJob).join("");
+  window.scrollTo(0, s);
+}
+
+function renderAdJob(job) {
+  const stepIdx = AD_STATUS_STEPS[job.status] ?? -1;
+  const badgeClass = job.status === "done" ? "badge-done" : job.status === "error" ? "badge-error" : stepIdx >= 0 ? "badge-running" : "badge-queued";
+  const badgeLabel = job.status === "done" ? "Complete" : job.status === "error" ? "Error" : job.status === "queued" ? "Queued" : "Running...";
+  const date = new Date(job.created_at).toLocaleString();
+  const steps = AD_STEPS.map((s, i) => {
+    const cls = i < stepIdx ? "done" : i === stepIdx ? "active-ad" : "";
+    return `<div class="step ${cls}">${i < stepIdx ? "&#10003; " : ""}${s}</div>`;
+  }).join("");
+
+  let outputs = "";
+  if (job.status === "done") {
+    const adTabs = ['research','copy','creative','audience'];
+    outputs = `
+      <div class="output-section">
+        <div class="tabs">
+          <div class="tab active-ad" onclick="showTab(this,'ad${job.id}','research',${JSON.stringify(adTabs)})">Research</div>
+          <div class="tab" onclick="showTab(this,'ad${job.id}','copy',${JSON.stringify(adTabs)})">Copy Variants</div>
+          <div class="tab" onclick="showTab(this,'ad${job.id}','creative',${JSON.stringify(adTabs)})">Creative</div>
+          <div class="tab" onclick="showTab(this,'ad${job.id}','audience',${JSON.stringify(adTabs)})">Audience</div>
+        </div>
+        <div id="tab-ad${job.id}-research">
+          <button class="copy-btn" onclick="copyText('research-text-${job.id}', this)">Copy</button>
+          <div id="research-text-${job.id}" class="output-text">${escHtml(job.research || "")}</div>
+        </div>
+        <div id="tab-ad${job.id}-copy" style="display:none">
+          <button class="copy-btn" onclick="copyText('copy-text-${job.id}', this)">Copy</button>
+          <div id="copy-text-${job.id}" class="output-text">${escHtml(job.ad_copy || "")}</div>
+        </div>
+        <div id="tab-ad${job.id}-creative" style="display:none">
+          <button class="copy-btn" onclick="copyText('creative-text-${job.id}', this)">Copy</button>
+          <div id="creative-text-${job.id}" class="output-text">${escHtml(job.creative_concepts || "")}</div>
+        </div>
+        <div id="tab-ad${job.id}-audience" style="display:none">
+          <button class="copy-btn" onclick="copyText('audience-text-${job.id}', this)">Copy</button>
+          <div id="audience-text-${job.id}" class="output-text">${escHtml(job.audience_brief || "")}</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="action-btn" href="/outputs/ad-${job.id}.txt" download>Download All</a>
+        ${job.canva_url ? `<a class="action-btn" href="${escHtml(job.canva_url)}" target="_blank" style="border-color:#0369a1;color:#38bdf8;">Open in Canva &#8599;</a>` : ""}
+      </div>`;
+  }
+
+  return `<div class="job-card" id="ad-job-${job.id}">
+    <div class="job-header">
+      <div class="job-topic">${escHtml(job.product)}</div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="job-platform">${escHtml(job.platform)}</span>
+        <span class="badge ${badgeClass}">${badgeLabel}</span>
+      </div>
+    </div>
+    <div class="progress">${steps}</div>
+    <div class="job-meta">${date} &middot; ID: ${job.id}</div>
+    ${outputs}
+  </div>`;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
 loadJobs();
-// Only poll for running jobs, not on a fixed interval that disrupts reading
+loadAdJobs();
 setInterval(() => {
   const hasRunning = Object.values(jobs).some(j => j.status !== "done" && j.status !== "error");
   if (hasRunning) loadJobs();
+  const hasAdRunning = Object.values(adJobs).some(j => j.status !== "done" && j.status !== "error");
+  if (hasAdRunning) loadAdJobs();
 }, 3000);
 </script>
 </body>
