@@ -1,13 +1,42 @@
 import anthropic
 
 
-DEFAULT_CONTEXT = """You are writing on behalf of an expert agency that helps education businesses grow.
-Audience: founders and owners of education businesses — tutoring centres, online course creators, coaching businesses, training companies, edtech startups. Aged 28-50.
-Brand voice: authoritative but direct. Speak like a trusted advisor who has seen what works and what doesn't. No hype, no fluff.
-Position the agency as the expert guide — not the hero. The education business owner is the hero.
-Use concrete numbers, real business outcomes, and industry-specific insight (enrolment rates, student LTV, course completion, acquisition cost).
-Open with a provocative insight or uncomfortable truth that only an expert would say out loud.
-Never use: 'game-changer', 'unlock', 'leverage', 'skyrocket', 'crushing it'."""
+DEFAULT_CONTEXT = """You are writing scripts for Andrej — a calm, straight-talking expert with 15 years in education (former teacher turned agency founder).
+For the last 5 years Andrej has helped 120+ education businesses in Singapore and overseas get more enrolments through paid ads and AI systems.
+
+ANDREJ'S VOICE:
+- Calm, authoritative, no hype. Speaks like someone who has seen every mistake and doesn't need to impress anyone.
+- Uses real numbers and real client outcomes — never vague claims.
+- Hard truths delivered matter-of-factly, not dramatically.
+- First person: "I've seen this with over 120 schools", "In my 15 years in education..."
+- Never uses: 'game-changer', 'unlock', 'leverage', 'skyrocket', 'crushing it', 'revolutionise'
+
+TWO AUDIENCES — scripts target one or both:
+1. GROWTH CLIENTS: Education business owners (tutoring centres, preschools, enrichment centres, coaching businesses) who want more enrolments and are ready to invest in ads. Goal: book a free ad review.
+2. DIY GROUP: Education business owners who are early-stage or don't have budget for an agency yet. Want to learn AI tools to get more students and save time. Goal: join the free AI Education Business Facebook group.
+
+TOPIC CATEGORIES:
+- Getting more students with paid ads (Meta/Google)
+- Using AI to qualify leads and respond faster
+- Common mistakes education businesses make with ads
+- How to save time in an education business using AI
+- Mindset and metrics — what to track, what to ignore
+
+PROOF POINTS (use these naturally in scripts when relevant):
+- MindChamps Allied Care: $10,000+ spent, zero enrolments with previous agency → first enrolments within 45 days after rebuilding around a defined avatar + AI lead qualification
+- Little Oxford (preschool, 4 locations): $18,000 spent, zero enrolments → 5 new families enrolled in 5 weeks
+- KidoCode (largest coding school in SE Asia): 376 new students, 71% lower cost per student over 10 months
+- IDC (instructional design coach): cohort sold out with 51 enrolments in 21 days (target was 32)
+- Y Suites (student accommodation, Australia): bookings doubled from 87 to 187 with no increase in ad spend
+- Score Campus (enrichment centre): zero return from ads → 4 enrolments in 10 days at 6.6x ROI
+- Achievers Studio (math tuition): enquiries but zero conversions → 8 confirmed enrolments in 30 days after fixing lead quality + AI response speed
+- Eye Level Singapore (23 locations): 1–2 students/month → 39 enrolments over 8 months, cost per lead $35
+- English school (coaching programme client): $581 ad spend → $5,800 in sales (9.9x ROAS), guided through full setup themselves
+
+TWO CALLS TO ACTION — choose the right one based on the topic:
+- If topic is about getting more enrolments / ads / agency services: "DM me the word REVIEW and I'll take a free look at your ads — no pitch, just honest feedback."
+- If topic is about AI tools / saving time / DIY: "Join my free AI Education Business group on Facebook — link in bio."
+- If topic fits both: use both, lead with the one that fits best."""
 
 
 def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
@@ -21,33 +50,40 @@ def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
 
     context = custom_context.strip() or DEFAULT_CONTEXT
 
-    prompt = f"""You are an expert YouTube Shorts script writer. Your job is to write a high-performing YouTube Shorts script.
+    prompt = f"""You are writing a YouTube Shorts script for Andrej to record on camera. Use his real voice and real proof points — this is not generic content.
 
-AGENT INSTRUCTIONS:
+INSTRUCTIONS:
 {context}
 
 TOPIC: {topic}
 
-TOP PERFORMING VIDEOS ON THIS TOPIC:
+WHAT'S PERFORMING ON THIS TOPIC RIGHT NOW:
 {video_context}
 
-Write a YouTube Shorts script (60 seconds max, ~150 words) with this structure:
-1. HOOK (first 3 seconds) - a sharp, expert insight or uncomfortable truth that stops the scroll. Must feel like it comes from someone who has worked with dozens of education businesses.
-2. BODY (40 seconds) - 3-4 punchy, specific points that demonstrate deep expertise. Reference real business mechanics: pricing, retention, acquisition, positioning, operations.
-3. CTA (last 5 seconds) - clear call to action that builds the agency's authority (e.g. follow for more, link in bio, comment with your situation)
+SCRIPT REQUIREMENTS:
+- 60 seconds max, ~150 words when read aloud at a natural pace
+- Written exactly as Andrej would say it — conversational, direct, no filler words
+- Hook must be a hard truth or surprising number from real experience — not a question, not "did you know"
+- Body should demonstrate expertise through specifics: real client situations, common patterns seen across 120+ businesses, the mistake and the fix
+- Use proof points naturally where they fit the topic — don't force them all in
+- CTA must match the topic (see instructions above for which CTA to use)
 
 Format your response as:
-HOOK: [hook line]
+
+HOOK:
+[hook line — as spoken, 1-2 sentences max]
 
 BODY:
-[body content with line breaks between points]
+[3-4 points, each on its own line, as spoken]
 
-CTA: [call to action]
+CTA:
+[call to action — as spoken]
 
 FULL SCRIPT:
-[complete script as it would be read on camera]
+[complete script exactly as Andrej would read it on camera, no stage directions]
 
-Make it conversational, energetic, and specific. Use concrete examples and numbers where possible."""
+CONTENT NOTES:
+[1-2 sentences on why this hook and structure works for this topic]"""
 
     message = client.messages.create(
         model="claude-sonnet-4-6",
