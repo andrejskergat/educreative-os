@@ -83,61 +83,30 @@ async def send_event(job_id: str, event: str, data: str):
         await _queues[job_id].put(f"event: {event}\ndata: {data}\n\n")
 
 
-async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", thumbnail_context: str = ""):
-    from agents import description_agent, script_writer, thumbnail_agent, youtube_research
+async def run_pipeline_async(job_id: str, topic: str, script_context: str = ""):
+    from agents import script_writer, youtube_research
 
     try:
-        logger.info(f"[{job_id}] Starting YouTube research for: {topic}")
-        await send_event(job_id, "progress", json.dumps({"step": 1, "msg": "Running YouTube Research..."}))
+        await send_event(job_id, "progress", json.dumps({"step": 1, "msg": "Researching topic..."}))
         db_update(job_id, status="researching")
         yt_data = await asyncio.to_thread(youtube_research.run, topic)
         db_update(job_id, youtube_data=json.dumps(yt_data), research=yt_data.get("forum_research", ""))
         video_count = len(yt_data.get("videos", []))
-        await send_event(job_id, "progress", json.dumps({"step": 1, "msg": f"Found {video_count} videos + forum research", "done": True}))
+        await send_event(job_id, "progress", json.dumps({"step": 1, "msg": f"Research done — {video_count} videos + community insights", "done": True}))
 
-        logger.info(f"[{job_id}] Starting script writer")
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Writing script..."}))
         db_update(job_id, status="scripting")
         script_data = await asyncio.to_thread(script_writer.run, topic, yt_data, script_context)
         db_update(job_id, script=script_data["script"])
-        logger.info(f"[{job_id}] Script done.")
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Script written", "done": True}))
 
-        logger.info(f"[{job_id}] Starting thumbnail agent")
-        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Designing thumbnail..."}))
-        db_update(job_id, status="thumbnail")
-        thumb_data = await asyncio.to_thread(thumbnail_agent.run, topic, script_data["script"], thumbnail_context)
-        db_update(job_id, thumbnail=thumb_data["thumbnail_concept"], canva_url=thumb_data.get("canva_url", ""))
-        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Thumbnail ready", "done": True}))
-
-        logger.info(f"[{job_id}] Starting description agent")
-        await send_event(job_id, "progress", json.dumps({"step": 4, "msg": "Writing description & hashtags..."}))
-        db_update(job_id, status="description")
-        desc_data = await asyncio.to_thread(description_agent.run, topic, script_data["script"])
-        db_update(job_id, description=desc_data["description"])
-        logger.info(f"[{job_id}] Description done.")
-        await send_event(job_id, "progress", json.dumps({"step": 4, "msg": "Description ready", "done": True}))
-
-        output_path = Path("outputs") / f"{job_id}.txt"
-        job = db_get(job_id)
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(f"TOPIC: {topic}\n")
-            f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n")
-            f.write("=" * 60 + "\nSCRIPT\n" + "=" * 60 + "\n")
-            f.write(job["script"] + "\n\n")
-            f.write("=" * 60 + "\nTHUMBNAIL CONCEPT\n" + "=" * 60 + "\n")
-            f.write(job["thumbnail"] + "\n\n")
-            f.write("=" * 60 + "\nDESCRIPTION & HASHTAGS\n" + "=" * 60 + "\n")
-            f.write(job["description"] + "\n")
-
         db_update(job_id, status="done")
-        logger.info(f"[{job_id}] Pipeline complete.")
         await send_event(job_id, "done", json.dumps({"job_id": job_id}))
 
     except Exception as e:
         error_msg = traceback.format_exc()
         logger.error(f"[{job_id}] Pipeline failed: {error_msg}")
-        db_update(job_id, status="error", error=str(e))
+        db_update(job_id, status="error")
         await send_event(job_id, "error", json.dumps({"msg": str(e)}))
     finally:
         await asyncio.sleep(5)
@@ -167,8 +136,44 @@ async def create_job(request: Request):
     con.commit()
     con.close()
     _queues[job_id] = asyncio.Queue()
-    asyncio.create_task(run_pipeline_async(job_id, topic, script_context, thumbnail_context))
+    asyncio.create_task(run_pipeline_async(job_id, topic, script_context))
     return {"job_id": job_id}
+
+
+@app.post("/jobs/{job_id}/thumbnail")
+async def generate_thumbnail(job_id: str):
+    from agents import thumbnail_agent
+    job = db_get(job_id)
+    if not job or not job.get("script"):
+        return {"error": "job not found or script not ready"}
+    db_update(job_id, status="thumbnail")
+    try:
+        thumb_data = await asyncio.to_thread(
+            thumbnail_agent.run, job["topic"], job["script"], job.get("thumbnail_context", "")
+        )
+        db_update(job_id, thumbnail=thumb_data["thumbnail_concept"], canva_url=thumb_data.get("canva_url", ""), status="done")
+    except Exception as e:
+        db_update(job_id, status="done")
+        return {"error": str(e)}
+    return db_get(job_id)
+
+
+@app.post("/jobs/{job_id}/description")
+async def generate_description(job_id: str):
+    from agents import description_agent
+    job = db_get(job_id)
+    if not job or not job.get("script"):
+        return {"error": "job not found or script not ready"}
+    db_update(job_id, status="description")
+    try:
+        desc_data = await asyncio.to_thread(
+            description_agent.run, job["topic"], job["script"]
+        )
+        db_update(job_id, description=desc_data["description"], status="done")
+    except Exception as e:
+        db_update(job_id, status="done")
+        return {"error": str(e)}
+    return db_get(job_id)
 
 
 @app.get("/jobs")

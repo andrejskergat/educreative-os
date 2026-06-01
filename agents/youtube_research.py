@@ -40,41 +40,63 @@ def _search_youtube(topic: str, api_key: str) -> list:
     return videos
 
 
-def _research_with_claude(topic: str) -> dict:
+def _deep_research(topic: str) -> str:
     client = anthropic.Anthropic()
 
-    prompt = f"""You are a content researcher for an expert agency helping education businesses get more students.
+    prompt = f"""You are a senior content strategist researching what education business owners are actually saying online about this topic.
 
 TOPIC: {topic}
 
-Research this topic by drawing on what you know from:
-1. Reddit communities: r/Entrepreneur, r/smallbusiness, r/teachingresources, r/onlineeducation, r/edtech, education Facebook groups
-2. Common questions and complaints education business owners post online about this topic
-3. What angles get the most engagement (comments, shares) when this topic is discussed in forums
+Draw on everything you know from these specific communities and platforms:
 
-Provide:
+REDDIT — search these subreddits: r/Entrepreneur, r/smallbusiness, r/tutoring, r/Teachers, r/edtech, r/onlineeducation, r/elearning, r/startups
+QUORA — questions and answers from education business owners, tutors, school founders, enrichment centre owners
+LINKEDIN — posts, comments and articles from education entrepreneurs, school owners, edtech founders, education consultants
+FACEBOOK GROUPS — education business owner groups, tutoring business groups, preschool owner communities, private school groups
+FORUMS & COMMUNITIES — TeacherForums, education entrepreneur podcasts, edtech communities, coaching business forums
 
-PAIN POINTS:
-List 3-5 specific frustrations education business owners express about this topic online. Be specific — use the language they actually use.
+For each section below, write specifically about what education businesses (tutoring centres, preschools, enrichment centres, coaching businesses, online course creators) post and discuss:
 
-TOP ANGLES:
-List 3-5 content angles that consistently get high engagement on this topic. For each, note why it works (curiosity, fear, relief, social proof, etc.)
+---
 
-COMMON MISTAKES:
-List 3 mistakes education business owners commonly make related to this topic, based on what you see discussed in forums and communities.
+BURNING PAIN POINTS (from Reddit/Quora/Facebook groups):
+List 5-6 specific frustrations education business owners vent about online. Use their exact language and phrasing — the way they actually write in posts and comments. Include which platform each is most common on.
 
-HOOK IDEAS:
-Write 3 strong hook lines for a YouTube Short on this topic. Each must be a hard truth or surprising number — not a question.
+---
 
-Keep everything specific to education businesses (tutoring, preschools, enrichment centres, coaching, online courses)."""
+TOP PERFORMING CONTENT ANGLES (from LinkedIn/YouTube/blogs):
+List 5 content angles on this topic that get the most engagement (likes, comments, shares). For each: the angle, why it works emotionally (fear/relief/curiosity/social proof/status), and which platform it performs best on.
+
+---
+
+COMMON QUESTIONS (from Quora/Reddit):
+List the 5 most upvoted or frequently asked questions education business owners ask about this topic. Write them exactly as people ask them.
+
+---
+
+MISTAKES & MISCONCEPTIONS (from community discussions):
+List 4 mistakes or wrong beliefs education business owners commonly have about this topic, based on what you see corrected in forums and comment threads.
+
+---
+
+HOOK IDEAS FOR YOUTUBE SHORTS:
+Write 5 strong opening hooks for a short video on this topic. Each must be:
+- A hard truth, surprising number, or counterintuitive insight — NOT a question
+- Written as something Andrej (15 years in education, helped 120+ education businesses in Singapore) would say from experience
+- Specific to education businesses (not generic business advice)
+
+---
+
+BEST POSTING STRATEGY FOR THIS TOPIC:
+One paragraph on which platform to lead with, what format works best, and the ideal CTA for this specific topic."""
 
     message = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=1024,
+        max_tokens=2000,
         messages=[{"role": "user", "content": prompt}],
     )
 
-    return {"forum_research": message.content[0].text}
+    return message.content[0].text
 
 
 def run(topic: str) -> dict:
@@ -87,10 +109,10 @@ def run(topic: str) -> dict:
         except Exception:
             pass
 
-    forum_data = _research_with_claude(topic)
+    forum_research = _deep_research(topic)
 
     return {
         "topic": topic,
         "videos": videos,
-        "forum_research": forum_data["forum_research"],
+        "forum_research": forum_research,
     }

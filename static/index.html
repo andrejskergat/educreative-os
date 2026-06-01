@@ -32,12 +32,14 @@
   .step.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
   .step.done { background: #14532d; color: #4ade80; border-color: #166534; }
   .job-meta { font-size: 12px; color: #555; }
-  .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
   .action-btn { font-size: 12px; padding: 6px 14px; border-radius: 7px; border: 1px solid #333; background: #111; color: #aaa; cursor: pointer; text-decoration: none; transition: all 0.2s; }
   .action-btn:hover { border-color: #7c3aed; color: #c4b5fd; }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .action-btn.generating { border-color: #4c1d95; color: #a78bfa; }
   .output-section { margin-top: 16px; border-top: 1px solid #222; padding-top: 16px; }
   .output-text { font-size: 13px; color: #ccc; white-space: pre-wrap; background: #0f0f13; border-radius: 8px; padding: 12px; border: 1px solid #222; max-height: 400px; overflow-y: auto; line-height: 1.6; user-select: text; cursor: text; }
-  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
   .tab { font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; border: 1px solid #222; background: #111; color: #666; }
   .tab.active { background: #1e1b4b; color: #a78bfa; border-color: #4c1d95; }
   .empty { text-align: center; padding: 48px; color: #444; font-size: 14px; }
@@ -49,10 +51,11 @@
   .agent-setting label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; font-weight: 500; }
   .agent-setting small { font-size: 11px; color: #555; display: block; margin-bottom: 6px; }
   .agent-setting textarea { height: 60px; font-size: 13px; }
-  .thumbnail-img { width: 100%; max-width: 220px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px; display: block; }
   .copy-btn { font-size: 11px; padding: 3px 10px; border-radius: 5px; border: 1px solid #333; background: #111; color: #888; cursor: pointer; float: right; margin-bottom: 6px; }
   .copy-btn:hover { border-color: #7c3aed; color: #c4b5fd; }
   .copy-btn.copied { border-color: #166534; color: #4ade80; }
+  .manual-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid #1e1e2e; }
+  .manual-label { font-size: 11px; color: #555; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
@@ -63,31 +66,31 @@
 <div class="container">
   <div class="input-card">
     <h2>What do you want to create today?</h2>
-    <textarea id="topicInput" placeholder="e.g. Traditional education business vs AI education business"></textarea>
+    <textarea id="topicInput" placeholder="e.g. Why your education business ads aren't converting"></textarea>
     <div class="settings-toggle" onclick="toggleSettings()">
       <span id="settingsArrow">&#9658;</span> Agent Settings (optional)
     </div>
     <div class="settings-panel" id="settingsPanel">
       <div class="agent-setting">
-        <label>Script Writer - Extra Context</label>
-        <small>Brand voice, audience, hooks to avoid, style preferences</small>
-        <textarea id="scriptContext" placeholder="e.g. Audience: edtech founders 28-45. Open with a shocking stat. Never use 'game-changer'."></textarea>
+        <label>Script Writer — Extra Context</label>
+        <small>Override brand voice, audience, or style for this job</small>
+        <textarea id="scriptContext" placeholder="e.g. Focus on preschool owners specifically. Use the MindChamps case study as the hook."></textarea>
       </div>
       <div class="agent-setting">
-        <label>Thumbnail Designer - Extra Context</label>
-        <small>Brand colours, style, fonts, examples to follow or avoid</small>
-        <textarea id="thumbnailContext" placeholder="e.g. Brand colours: purple #7c3aed and white. Bold sans-serif. Always split-screen."></textarea>
+        <label>Thumbnail Designer — Extra Context</label>
+        <small>Override colours, style or layout for this job</small>
+        <textarea id="thumbnailContext" placeholder="e.g. Use purple #7c3aed instead of cyan. Bold sans-serif. Split-screen layout."></textarea>
       </div>
     </div>
-    <button class="btn" onclick="submitJob()">Generate Content</button>
+    <button class="btn" onclick="submitJob()">Research + Write Script</button>
   </div>
   <div class="jobs-title">Recent Jobs</div>
   <div id="jobsList"></div>
 </div>
 
 <script>
-const STEPS = ["YouTube Research", "Script", "Thumbnail", "Description"];
-const STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, thumbnail: 2, description: 3, done: 4, error: -2 };
+const STEPS = ["Research", "Script"];
+const STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, done: 2, error: -2 };
 let jobs = {};
 let activeStreams = new Set();
 
@@ -126,7 +129,6 @@ function streamJob(jobId) {
 async function loadJobs() {
   const res = await fetch("/jobs");
   const data = await res.json();
-  // Only update cards that are not done — avoid disturbing completed ones user is reading
   data.forEach(j => {
     if (!jobs[j.id] || jobs[j.id].status !== "done") {
       jobs[j.id] = j;
@@ -146,6 +148,22 @@ async function updateJobCard(jobId) {
     el.outerHTML = renderJob(job);
     window.scrollTo(0, scroll);
   }
+}
+
+async function generateThumbnail(jobId, btn) {
+  btn.disabled = true;
+  btn.classList.add("generating");
+  btn.textContent = "Generating...";
+  await fetch(`/jobs/${jobId}/thumbnail`, { method: "POST" });
+  await updateJobCard(jobId);
+}
+
+async function generateDescription(jobId, btn) {
+  btn.disabled = true;
+  btn.classList.add("generating");
+  btn.textContent = "Generating...";
+  await fetch(`/jobs/${jobId}/description`, { method: "POST" });
+  await updateJobCard(jobId);
 }
 
 function renderJobs(jobList) {
@@ -176,38 +194,55 @@ function renderJob(job) {
   }).join("");
 
   let outputs = "";
-  if (job.status === "done") {
-    const thumbImg = job.thumbnail_url ? `<img src="${job.thumbnail_url}" class="thumbnail-img" alt="Thumbnail" /><br>` : "";
+  if (job.status === "done" || job.thumbnail || job.description) {
+    const tabs = [
+      { key: "script", label: "Script", show: !!job.script },
+      { key: "thumbnail", label: "Thumbnail", show: !!job.thumbnail },
+      { key: "description", label: "Description", show: !!job.description },
+      { key: "research", label: "Research", show: !!job.research },
+    ].filter(t => t.show);
+
+    const firstTab = tabs[0]?.key || "script";
+
+    const tabHtml = tabs.map((t, i) =>
+      `<div class="tab ${i === 0 ? 'active' : ''}" onclick="showTab(this,'${job.id}','${t.key}')">${t.label}</div>`
+    ).join("");
+
+    const contentHtml = `
+      <div id="tab-${job.id}-script" ${firstTab !== 'script' ? 'style="display:none"' : ''}>
+        <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
+        <div id="script-text-${job.id}" class="output-text">${escHtml(job.script || "")}</div>
+      </div>
+      <div id="tab-${job.id}-thumbnail" style="display:${job.thumbnail ? (firstTab === 'thumbnail' ? 'block' : 'none') : 'none'}">
+        <button class="copy-btn" onclick="copyText('thumb-text-${job.id}', this)">Copy</button>
+        <div id="thumb-text-${job.id}" class="output-text">${escHtml(job.thumbnail || "")}</div>
+        ${job.canva_url ? `<a class="action-btn" href="${escHtml(job.canva_url)}" target="_blank" style="margin-top:8px;display:inline-block;border-color:#7c3aed;color:#c4b5fd;">Open in Canva &#8599;</a>` : ""}
+      </div>
+      <div id="tab-${job.id}-description" style="display:${job.description ? (firstTab === 'description' ? 'block' : 'none') : 'none'}">
+        <button class="copy-btn" onclick="copyText('desc-text-${job.id}', this)">Copy</button>
+        <div id="desc-text-${job.id}" class="output-text">${escHtml(job.description || "")}</div>
+      </div>
+      <div id="tab-${job.id}-research" style="display:${job.research ? (firstTab === 'research' ? 'block' : 'none') : 'none'}">
+        <button class="copy-btn" onclick="copyText('research-text-${job.id}', this)">Copy</button>
+        <div id="research-text-${job.id}" class="output-text">${escHtml(job.research || "")}</div>
+      </div>`;
+
+    const manualButtons = job.status === "done" ? `
+      <div class="manual-section">
+        <div class="manual-label">Generate on demand</div>
+        <div class="actions">
+          <button class="action-btn" onclick="generateThumbnail('${job.id}', this)">${job.thumbnail ? "Regenerate Thumbnail" : "Generate Thumbnail"}</button>
+          <button class="action-btn" onclick="generateDescription('${job.id}', this)">${job.description ? "Regenerate Description" : "Generate Description"}</button>
+          <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
+        </div>
+      </div>` : "";
+
     outputs = `
       <div class="output-section">
-        <div class="tabs">
-          <div class="tab active" onclick="showTab(this,'${job.id}','script')">Script</div>
-          <div class="tab" onclick="showTab(this,'${job.id}','thumbnail')">Thumbnail</div>
-          <div class="tab" onclick="showTab(this,'${job.id}','description')">Description</div>
-          <div class="tab" onclick="showTab(this,'${job.id}','research')">Research</div>
-        </div>
-        <div id="tab-${job.id}-script">
-          <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
-          <div id="script-text-${job.id}" class="output-text">${escHtml(job.script || "")}</div>
-        </div>
-        <div id="tab-${job.id}-thumbnail" style="display:none">
-          ${thumbImg}
-          <button class="copy-btn" onclick="copyText('thumb-text-${job.id}', this)">Copy</button>
-          <div id="thumb-text-${job.id}" class="output-text">${escHtml(job.thumbnail || "")}</div>
-        </div>
-        <div id="tab-${job.id}-description" style="display:none">
-          <button class="copy-btn" onclick="copyText('desc-text-${job.id}', this)">Copy</button>
-          <div id="desc-text-${job.id}" class="output-text">${escHtml(job.description || "")}</div>
-        </div>
-        <div id="tab-${job.id}-research" style="display:none">
-          <button class="copy-btn" onclick="copyText('research-text-${job.id}', this)">Copy</button>
-          <div id="research-text-${job.id}" class="output-text">${escHtml(job.research || "")}</div>
-        </div>
+        <div class="tabs">${tabHtml}</div>
+        ${contentHtml}
       </div>
-      <div class="actions">
-        <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
-        ${job.canva_url ? `<a class="action-btn" href="${escHtml(job.canva_url)}" target="_blank" style="border-color:#7c3aed;color:#c4b5fd;">Open in Canva &#8599;</a>` : ""}
-      </div>`;
+      ${manualButtons}`;
   }
 
   return `<div class="job-card" id="job-${job.id}">
@@ -222,7 +257,8 @@ function showTab(el, jobId, tab) {
   el.closest('.output-section').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   ['script','thumbnail','description','research'].forEach(t => {
-    document.getElementById(`tab-${jobId}-${t}`).style.display = t === tab ? 'block' : 'none';
+    const el = document.getElementById(`tab-${jobId}-${t}`);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
   });
 }
 
@@ -231,7 +267,6 @@ function escHtml(str) {
 }
 
 loadJobs();
-// Only poll for running jobs, not on a fixed interval that disrupts reading
 setInterval(() => {
   const hasRunning = Object.values(jobs).some(j => j.status !== "done" && j.status !== "error");
   if (hasRunning) loadJobs();
