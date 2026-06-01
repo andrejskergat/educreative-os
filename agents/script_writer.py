@@ -33,6 +33,14 @@ PROOF POINTS (use these naturally in scripts when relevant):
 - Eye Level Singapore (23 locations): 1–2 students/month → 39 enrolments over 8 months, cost per lead $35
 - English school (coaching programme client): $581 ad spend → $5,800 in sales (9.9x ROAS), guided through full setup themselves
 
+EDUCATION BUSINESS LANGUAGE — always use these terms, not generic business terms:
+- "tours" or "centre tours" not "calls" or "meetings"
+- "enrolments" not "sales" or "conversions"
+- "families" or "parents" not "customers" or "clients"
+- "students" not "users" or "leads"
+- "enquiries" not "leads" (unless talking about ad metrics)
+- "centre" not "location" or "branch"
+
 TWO CALLS TO ACTION — choose the right one based on the topic:
 - If topic is about getting more enrolments / ads / agency services: "DM me the word REVIEW and I'll take a free look at your ads — no pitch, just honest feedback."
 - If topic is about AI tools / saving time / DIY: "Join my free AI Education Business group on Facebook — link in bio."
