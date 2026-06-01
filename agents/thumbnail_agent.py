@@ -4,9 +4,13 @@ import httpx
 import anthropic
 
 
-DEFAULT_CONTEXT = """Brand colours: dark navy (#0A0F2C) and electric cyan (#00D4FF).
-Style: bold split-screen, high contrast, mobile-first.
-No faces — use icons and symbols only. Always include a VS or contrast element."""
+DEFAULT_CONTEXT = """You are designing for an expert agency that serves education businesses.
+Brand position: trusted authority, not a hype brand. Clean, confident, premium.
+Style: bold but not loud. Authoritative split-screen or statement layouts. High contrast, mobile-first.
+Colours: deep navy (#0A0F2C), electric cyan (#00D4FF), white text. Avoid garish colours.
+No stock-photo faces. Use icons, numbers, arrows, and bold text as visual elements.
+The thumbnail should signal expertise — like something an industry insider would post, not a motivational account.
+Always contrast two states: before/after, old way/new way, wrong/right, problem/solution."""
 
 
 def _create_canva_thumbnail(canva_prompt: str) -> str | None:
@@ -53,7 +57,6 @@ Design a thumbnail concept for this YouTube Short. Provide:
 4. VISUAL ELEMENTS: What images/icons to use (no faces needed, use icons/symbols)
 5. COLOUR SCHEME: Specific hex colours (high contrast, eye-catching)
 6. EMOTION/TONE: What feeling the thumbnail should trigger (curiosity, shock, FOMO)
-7. CANVA PROMPT: A ready-to-use prompt you could type into Canva's AI generator
 
 End your response with exactly this line:
 CANVA PROMPT: [single sentence prompt for Canva AI]
