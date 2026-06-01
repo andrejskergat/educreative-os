@@ -312,6 +312,8 @@ function badgeFor(status, type="yt") {
 }
 
 function showTab(el, prefix, tab, allTabs) {
+  const tabs = typeof allTabs === 'string' ? allTabs.split(',') : allTabs;
+  allTabs = tabs;
   const sec = el.closest('.output-section');
   sec.querySelectorAll('.tab').forEach(t=>{ t.classList.remove('active-yt','active-ad','active-meta'); });
   const cls = prefix.startsWith('meta') ? 'active-meta' : prefix.startsWith('ad') ? 'active-ad' : 'active-yt';
@@ -363,9 +365,9 @@ function renderJob(job) {
   if(job.status==="done"){
     out=`<div class="output-section">
       <div class="tabs">
-        <div class="tab active-yt" onclick="showTab(this,'yt${job.id}','script',['script','thumbnail','description'])">Script</div>
-        <div class="tab" onclick="showTab(this,'yt${job.id}','thumbnail',['script','thumbnail','description'])">Thumbnail</div>
-        <div class="tab" onclick="showTab(this,'yt${job.id}','description',['script','thumbnail','description'])">Description</div>
+        <div class="tab active-yt" onclick="showTab(this,'yt${job.id}','script','script,thumbnail,description')">Script</div>
+        <div class="tab" onclick="showTab(this,'yt${job.id}','thumbnail','script,thumbnail,description')">Thumbnail</div>
+        <div class="tab" onclick="showTab(this,'yt${job.id}','description','script,thumbnail,description')">Description</div>
       </div>
       <div id="tab-yt${job.id}-script"><button class="copy-btn" onclick="copyText('yt-script-${job.id}',this)">Copy</button><div id="yt-script-${job.id}" class="output-text">${escHtml(job.script||'')}</div></div>
       <div id="tab-yt${job.id}-thumbnail" style="display:none"><button class="copy-btn" onclick="copyText('yt-thumb-${job.id}',this)">Copy</button><div id="yt-thumb-${job.id}" class="output-text">${escHtml(job.thumbnail||'')}</div></div>
@@ -423,13 +425,12 @@ function renderAdJob(job) {
   const steps=AD_STEPS.map((s,i)=>`<div class="step ${i<idx?'done':i===idx?'active-ad':''}">${i<idx?'✓ ':''}${s}</div>`).join('');
   let out='';
   if(job.status==="done"){
-    const tabs=['research','copy','creative','audience'];
     out=`<div class="output-section">
       <div class="tabs">
-        <div class="tab active-ad" onclick="showTab(this,'ad${job.id}','research',${JSON.stringify(tabs)})">Research</div>
-        <div class="tab" onclick="showTab(this,'ad${job.id}','copy',${JSON.stringify(tabs)})">Copy Variants</div>
-        <div class="tab" onclick="showTab(this,'ad${job.id}','creative',${JSON.stringify(tabs)})">Creative</div>
-        <div class="tab" onclick="showTab(this,'ad${job.id}','audience',${JSON.stringify(tabs)})">Audience</div>
+        <div class="tab active-ad" onclick="showTab(this,'ad${job.id}','research','research,copy,creative,audience')">Research</div>
+        <div class="tab" onclick="showTab(this,'ad${job.id}','copy','research,copy,creative,audience')">Copy Variants</div>
+        <div class="tab" onclick="showTab(this,'ad${job.id}','creative','research,copy,creative,audience')">Creative</div>
+        <div class="tab" onclick="showTab(this,'ad${job.id}','audience','research,copy,creative,audience')">Audience</div>
       </div>
       <div id="tab-ad${job.id}-research"><button class="copy-btn" onclick="copyText('ad-res-${job.id}',this)">Copy</button><div id="ad-res-${job.id}" class="output-text">${escHtml(job.research||'')}</div></div>
       <div id="tab-ad${job.id}-copy" style="display:none"><button class="copy-btn" onclick="copyText('ad-copy-${job.id}',this)">Copy</button><div id="ad-copy-${job.id}" class="output-text">${escHtml(job.ad_copy||'')}</div></div>
@@ -528,15 +529,14 @@ function renderMetaJob(job) {
       }
     } catch(e){}
 
-    const tabs=['competitor','analysis','copy','creative','canva','audience'];
     out=`<div class="output-section">
       <div class="tabs">
-        <div class="tab active-meta" onclick="showTab(this,'meta${job.id}','competitor',${JSON.stringify(tabs)})">Competitor Ads</div>
-        <div class="tab" onclick="showTab(this,'meta${job.id}','analysis',${JSON.stringify(tabs)})">Analysis</div>
-        <div class="tab" onclick="showTab(this,'meta${job.id}','copy',${JSON.stringify(tabs)})">Copy Variants</div>
-        <div class="tab" onclick="showTab(this,'meta${job.id}','creative',${JSON.stringify(tabs)})">Creative Brief</div>
-        <div class="tab" onclick="showTab(this,'meta${job.id}','canva',${JSON.stringify(tabs)})">Canva Designs</div>
-        <div class="tab" onclick="showTab(this,'meta${job.id}','audience',${JSON.stringify(tabs)})">Audience</div>
+        <div class="tab active-meta" onclick="showTab(this,'meta${job.id}','competitor','competitor,analysis,copy,creative,canva,audience')">Competitor Ads</div>
+        <div class="tab" onclick="showTab(this,'meta${job.id}','analysis','competitor,analysis,copy,creative,canva,audience')">Analysis</div>
+        <div class="tab" onclick="showTab(this,'meta${job.id}','copy','competitor,analysis,copy,creative,canva,audience')">Copy Variants</div>
+        <div class="tab" onclick="showTab(this,'meta${job.id}','creative','competitor,analysis,copy,creative,canva,audience')">Creative Brief</div>
+        <div class="tab" onclick="showTab(this,'meta${job.id}','canva','competitor,analysis,copy,creative,canva,audience')">Canva Designs</div>
+        <div class="tab" onclick="showTab(this,'meta${job.id}','audience','competitor,analysis,copy,creative,canva,audience')">Audience</div>
       </div>
       <div id="tab-meta${job.id}-competitor">${bestAdsHtml}</div>
       <div id="tab-meta${job.id}-analysis" style="display:none"><button class="copy-btn" onclick="copyText('meta-analysis-${job.id}',this)">Copy</button><div id="meta-analysis-${job.id}" class="output-text">${escHtml(job.competitor_analysis||'')}</div></div>
