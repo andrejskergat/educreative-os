@@ -65,30 +65,33 @@ TOP YOUTUBE VIDEOS ON THIS TOPIC:
 FORUM & COMMUNITY RESEARCH (pain points, angles, hooks from Reddit/Facebook/online communities):
 {forum_research}
 
-SCRIPT REQUIREMENTS:
-- 60 seconds max, ~150 words when read aloud at a natural pace
-- Written exactly as Andrej would say it — conversational, direct, no filler words
-- Hook must be a hard truth or surprising number from real experience — not a question, not "did you know"
-- Body should demonstrate expertise through specifics: real client situations, common patterns seen across 120+ businesses, the mistake and the fix
-- Use proof points naturally where they fit the topic — don't force them all in
-- CTA must match the topic (see instructions above for which CTA to use)
+LANGUAGE STYLE — this is critical:
+Write the way education business owners actually talk at BNI events, in Facebook group posts, or WhatsApp messages to each other.
+NOT polished. NOT corporate. NOT a blog post read out loud.
+Think: "So I had this parent call me last week..." or "Honestly the number of centres I see doing this..." or "And the frustrating thing is — they've already spent the money."
+Short sentences. Real hesitations. The way a trusted expert talks to a peer, not presents to an audience.
+No buzzwords. No "in today's digital landscape". No "it's so important that".
 
-Format your response as:
+SCRIPT REQUIREMENTS:
+- 60 seconds max, ~150 words at a natural speaking pace
+- Hook: one hard truth or real number from experience. No question openers. No "did you know".
+- Body: 3-4 points. Each one should feel like something Andrej would say mid-conversation — specific, slightly blunt, grounded in what he's actually seen across 120+ businesses.
+- Use a proof point only if it fits naturally — don't force it.
+- CTA: match the topic (ads/enrolments → free ad review, AI/time-saving → Facebook group)
+
+Output the script in this format — nothing else:
 
 HOOK:
-[hook line — as spoken, 1-2 sentences max]
+[1-2 sentences, exactly as spoken]
 
 BODY:
-[3-4 points, each on its own line, as spoken]
+[3-4 short points, each on its own line, exactly as spoken]
 
 CTA:
-[call to action — as spoken]
+[1-2 sentences, exactly as spoken]
 
-FULL SCRIPT:
-[complete script exactly as Andrej would read it on camera, no stage directions]
-
-CONTENT NOTES:
-[1-2 sentences on why this hook and structure works for this topic]"""
+---
+NOTE: [one sentence on why this hook lands for this audience]"""
 
     message = client.messages.create(
         model="claude-sonnet-4-6",
