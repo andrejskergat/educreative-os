@@ -42,11 +42,13 @@ TWO CALLS TO ACTION — choose the right one based on the topic:
 def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
     client = anthropic.Anthropic()
 
-    top_videos = youtube_data["videos"][:5]
+    top_videos = youtube_data.get("videos", [])[:5]
     video_context = "\n".join([
         f"- \"{v['title']}\" ({v['views']:,} views) by {v['channel']}"
         for v in top_videos
-    ])
+    ]) or "No YouTube data available."
+
+    forum_research = youtube_data.get("forum_research", "")
 
     context = custom_context.strip() or DEFAULT_CONTEXT
 
@@ -57,8 +59,11 @@ INSTRUCTIONS:
 
 TOPIC: {topic}
 
-WHAT'S PERFORMING ON THIS TOPIC RIGHT NOW:
+TOP YOUTUBE VIDEOS ON THIS TOPIC:
 {video_context}
+
+FORUM & COMMUNITY RESEARCH (pain points, angles, hooks from Reddit/Facebook/online communities):
+{forum_research}
 
 SCRIPT REQUIREMENTS:
 - 60 seconds max, ~150 words when read aloud at a natural pace

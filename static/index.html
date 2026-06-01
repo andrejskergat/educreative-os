@@ -184,6 +184,7 @@ function renderJob(job) {
           <div class="tab active" onclick="showTab(this,'${job.id}','script')">Script</div>
           <div class="tab" onclick="showTab(this,'${job.id}','thumbnail')">Thumbnail</div>
           <div class="tab" onclick="showTab(this,'${job.id}','description')">Description</div>
+          <div class="tab" onclick="showTab(this,'${job.id}','research')">Research</div>
         </div>
         <div id="tab-${job.id}-script">
           <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
@@ -197,6 +198,10 @@ function renderJob(job) {
         <div id="tab-${job.id}-description" style="display:none">
           <button class="copy-btn" onclick="copyText('desc-text-${job.id}', this)">Copy</button>
           <div id="desc-text-${job.id}" class="output-text">${escHtml(job.description || "")}</div>
+        </div>
+        <div id="tab-${job.id}-research" style="display:none">
+          <button class="copy-btn" onclick="copyText('research-text-${job.id}', this)">Copy</button>
+          <div id="research-text-${job.id}" class="output-text">${escHtml(job.research || "")}</div>
         </div>
       </div>
       <div class="actions">
@@ -216,7 +221,7 @@ function renderJob(job) {
 function showTab(el, jobId, tab) {
   el.closest('.output-section').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['script','thumbnail','description'].forEach(t => {
+  ['script','thumbnail','description','research'].forEach(t => {
     document.getElementById(`tab-${jobId}-${t}`).style.display = t === tab ? 'block' : 'none';
   });
 }

@@ -36,12 +36,11 @@ def init_db():
             script TEXT,
             thumbnail TEXT,
             canva_url TEXT,
-            thumbnail_url TEXT,
             description TEXT,
+            research TEXT,
             youtube_data TEXT,
             script_context TEXT,
-            thumbnail_context TEXT,
-            error TEXT
+            thumbnail_context TEXT
         )
     """)
     con.commit()
@@ -92,9 +91,9 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = "", 
         await send_event(job_id, "progress", json.dumps({"step": 1, "msg": "Running YouTube Research..."}))
         db_update(job_id, status="researching")
         yt_data = await asyncio.to_thread(youtube_research.run, topic)
-        db_update(job_id, youtube_data=json.dumps(yt_data))
-        logger.info(f"[{job_id}] YouTube research done. {len(yt_data['videos'])} videos found.")
-        await send_event(job_id, "progress", json.dumps({"step": 1, "msg": f"Found {len(yt_data['videos'])} videos", "done": True}))
+        db_update(job_id, youtube_data=json.dumps(yt_data), research=yt_data.get("forum_research", ""))
+        video_count = len(yt_data.get("videos", []))
+        await send_event(job_id, "progress", json.dumps({"step": 1, "msg": f"Found {video_count} videos + forum research", "done": True}))
 
         logger.info(f"[{job_id}] Starting script writer")
         await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Writing script..."}))
