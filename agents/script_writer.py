@@ -1,10 +1,11 @@
 import anthropic
 
 
-DEFAULT_CONTEXT = """You are writing for an edtech agency founder audience aged 28-45.
-Brand voice: direct, no fluff, energetic. Use concrete numbers and examples.
-Never use corporate jargon or phrases like 'game-changer' or 'leverage'.
-Always open with a provocative statement or shocking stat."""
+DEFAULT_CONTEXT = """You are creating content for an expert agency that helps education businesses grow and scale.
+Audience: owners and leaders of education businesses — tutoring centres, training providers, online course creators, preschools, coaching programmes — aged 30-55.
+Position the agency as the trusted expert partner. Voice: authoritative, warm, peer-to-peer. No hype.
+Lead with the education business owner's real problem. Use concrete results and specifics.
+Elevate the audience — treat them as intelligent professionals who have already tried the obvious solutions."""
 
 
 def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
@@ -29,9 +30,9 @@ TOP PERFORMING VIDEOS ON THIS TOPIC:
 {video_context}
 
 Write a YouTube Shorts script (60 seconds max, ~150 words) with this structure:
-1. HOOK (first 3 seconds) - bold, pattern-interrupting opening line that stops the scroll
-2. BODY (40 seconds) - 3-4 punchy points contrasting traditional education vs AI education
-3. CTA (last 5 seconds) - clear call to action
+1. HOOK (first 3 seconds) - a specific, pattern-interrupting insight that makes an education business owner stop scrolling
+2. BODY (40 seconds) - 3-4 concrete points that demonstrate expert knowledge and genuine value for education businesses
+3. CTA (last 5 seconds) - clear, low-pressure call to action that positions the agency as the expert guide
 
 Format your response as:
 HOOK: [hook line]

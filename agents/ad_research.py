@@ -50,10 +50,12 @@ def run(product: str, platform: str = "Meta") -> dict:
             for v in videos[:5]
         ])
 
-    prompt = f"""You are an expert direct-response ad strategist. Research and identify the best angles, hooks, and messaging frameworks for ads promoting: {product}
+    prompt = f"""You are an expert direct-response ad strategist specialising in agencies that serve education businesses.
 
-Platform: {platform}
-Audience: Edtech agency founders, educators, and learning professionals aged 28-45
+OFFER: {product}
+PLATFORM: {platform}
+AGENCY POSITIONING: Expert specialist agency helping education businesses (tutoring centres, training providers, online courses, preschools, coaching programmes) grow and scale.
+TARGET AUDIENCE: Education business owners and leaders aged 30-55 — intelligent, experienced, sceptical of generic marketing promises.
 {video_context}
 
 Based on what works in this space, provide a strategic ad research brief:

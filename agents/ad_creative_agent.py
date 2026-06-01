@@ -5,9 +5,10 @@ import anthropic
 
 
 DEFAULT_CONTEXT = """Brand colours: dark navy (#0A0F2C) and electric cyan (#00D4FF).
-Style: bold, high-contrast, mobile-first. Clean and modern.
-No stock photo faces — use bold typography, icons, and abstract visuals.
-Always include a clear focal point and readable text at thumbnail size."""
+Style: premium, clean, high-contrast, mobile-first. This is an expert agency — the creative must signal quality and authority.
+Avoid generic stock photos and clip art. Use bold typography, purposeful whitespace, and smart visual metaphors.
+Every creative should feel like it was made by a specialist, not a template mill.
+Target viewer: an education business owner who is intelligent, time-poor, and sceptical of marketing hype."""
 
 
 def run(

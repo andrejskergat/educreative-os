@@ -4,15 +4,16 @@ import anthropic
 def run(product: str, research: str, platform: str = "Meta") -> dict:
     client = anthropic.Anthropic()
 
-    prompt = f"""You are a paid media strategist expert in {platform} Ads audience targeting.
+    prompt = f"""You are a paid media strategist specialising in {platform} Ads for expert agencies serving education businesses.
 
 PRODUCT/OFFER: {product}
 PLATFORM: {platform}
+AGENCY POSITIONING: Expert specialist agency helping education businesses grow — tutoring centres, training providers, online course creators, preschools, and coaching programmes.
 
 RESEARCH CONTEXT:
 {research[:1200]}
 
-Build a complete audience targeting brief:
+Build a complete audience targeting brief focused on reaching education business owners and decision-makers:
 
 1. CORE AUDIENCE (Primary)
 - Age range & gender split

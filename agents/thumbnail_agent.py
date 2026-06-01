@@ -5,8 +5,9 @@ import anthropic
 
 
 DEFAULT_CONTEXT = """Brand colours: dark navy (#0A0F2C) and electric cyan (#00D4FF).
-Style: bold split-screen, high contrast, mobile-first.
-No faces — use icons and symbols only. Always include a VS or contrast element."""
+Style: clean, professional, high-contrast, mobile-first. Premium feel — this is an expert agency, not a generic content brand.
+Use bold typography and smart visual metaphors. Avoid cheap stock imagery or clip art.
+The thumbnail should signal expertise and credibility to education business owners at a glance."""
 
 
 def _create_canva_thumbnail(canva_prompt: str) -> str | None:

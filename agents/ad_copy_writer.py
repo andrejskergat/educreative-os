@@ -1,10 +1,12 @@
 import anthropic
 
 
-DEFAULT_CONTEXT = """Audience: Edtech agency founders and educators aged 28-45.
-Voice: Direct, confident, results-focused. Use numbers and specifics.
-Never use: 'game-changer', 'revolutionary', 'unlock your potential', or passive voice.
-Always lead with the problem or a bold claim backed by evidence."""
+DEFAULT_CONTEXT = """We are an expert agency that helps education businesses grow — tutoring centres, training providers, online course creators, preschools, coaching programmes.
+Audience: education business owners and leaders aged 30-55 who are serious about growth.
+Voice: expert, warm, direct. Peer-to-peer — we understand their world intimately. No hype, no pressure tactics.
+Position the agency as the specialist guide who has solved this problem before, many times.
+Lead with a real, specific pain they feel. Back every claim with evidence or a concrete outcome.
+Never use: 'unlock', 'skyrocket', 'game-changer', 'revolutionary', 'transform your business'."""
 
 
 def run(
@@ -27,7 +29,7 @@ def run(
         else ""
     )
 
-    prompt = f"""You are an elite direct-response copywriter specialising in Meta (Facebook/Instagram) ads for edtech.
+    prompt = f"""You are an elite direct-response copywriter specialising in Meta ads for expert agencies that serve education businesses.
 
 PRODUCT/OFFER: {product}
 PLATFORM: {platform}

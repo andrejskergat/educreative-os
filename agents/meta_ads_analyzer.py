@@ -43,7 +43,7 @@ def run(ads_data: dict, top_n: int = 10) -> dict:
 
     niche = ads_data.get("niche", "this niche")
 
-    prompt = f"""You are a Meta ads strategist. Analyze these top-performing competitor ads in the '{niche}' space and extract actionable creative intelligence.
+    prompt = f"""You are a Meta ads strategist specialising in expert agencies that serve education businesses. Analyze these top-performing competitor ads in the '{niche}' space and extract actionable creative intelligence for a premium, expert-positioned agency.
 
 These ads were ranked by longevity — the longer they've been running profitably, the higher the score.
 
