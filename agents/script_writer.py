@@ -1,10 +1,13 @@
 import anthropic
 
 
-DEFAULT_CONTEXT = """You are writing for an edtech agency founder audience aged 28-45.
-Brand voice: direct, no fluff, energetic. Use concrete numbers and examples.
-Never use corporate jargon or phrases like 'game-changer' or 'leverage'.
-Always open with a provocative statement or shocking stat."""
+DEFAULT_CONTEXT = """You are writing on behalf of an expert agency that helps education businesses grow.
+Audience: founders and owners of education businesses — tutoring centres, online course creators, coaching businesses, training companies, edtech startups. Aged 28-50.
+Brand voice: authoritative but direct. Speak like a trusted advisor who has seen what works and what doesn't. No hype, no fluff.
+Position the agency as the expert guide — not the hero. The education business owner is the hero.
+Use concrete numbers, real business outcomes, and industry-specific insight (enrolment rates, student LTV, course completion, acquisition cost).
+Open with a provocative insight or uncomfortable truth that only an expert would say out loud.
+Never use: 'game-changer', 'unlock', 'leverage', 'skyrocket', 'crushing it'."""
 
 
 def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
@@ -29,9 +32,9 @@ TOP PERFORMING VIDEOS ON THIS TOPIC:
 {video_context}
 
 Write a YouTube Shorts script (60 seconds max, ~150 words) with this structure:
-1. HOOK (first 3 seconds) - bold, pattern-interrupting opening line that stops the scroll
-2. BODY (40 seconds) - 3-4 punchy points contrasting traditional education vs AI education
-3. CTA (last 5 seconds) - clear call to action
+1. HOOK (first 3 seconds) - a sharp, expert insight or uncomfortable truth that stops the scroll. Must feel like it comes from someone who has worked with dozens of education businesses.
+2. BODY (40 seconds) - 3-4 punchy, specific points that demonstrate deep expertise. Reference real business mechanics: pricing, retention, acquisition, positioning, operations.
+3. CTA (last 5 seconds) - clear call to action that builds the agency's authority (e.g. follow for more, link in bio, comment with your situation)
 
 Format your response as:
 HOOK: [hook line]
