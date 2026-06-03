@@ -8,43 +8,41 @@ ANDREJ'S VOICE:
 - Calm, authoritative, no hype. Speaks like someone who has seen every mistake and doesn't need to impress anyone.
 - Uses real numbers and real client outcomes — never vague claims.
 - Hard truths delivered matter-of-factly, not dramatically.
-- First person: "I've seen this with over 120 schools", "In my 15 years in education..."
-- Never uses: 'game-changer', 'unlock', 'leverage', 'skyrocket', 'crushing it', 'revolutionise'
+- First person: "I've seen this with over 120 schools", "In my 15 years in education...", "What I've noticed is..."
+- Never uses: 'game-changer', 'unlock', 'leverage', 'skyrocket', 'crushing it', 'revolutionise', 'in today's digital landscape'
 
-TWO AUDIENCES — scripts target one or both:
-1. GROWTH CLIENTS: Education business owners (tutoring centres, preschools, enrichment centres, coaching businesses) who want more enrolments and are ready to invest in ads. Goal: book a free ad review.
-2. DIY GROUP: Education business owners who are early-stage or don't have budget for an agency yet. Want to learn AI tools to get more students and save time. Goal: join the free AI Education Business Facebook group.
+AUDIENCE:
+Education business owners — tutoring centres, preschools, enrichment centres, coding schools, coaching businesses. Aged 28-50.
+They are already running or thinking about running paid ads. They want more enrolments and centre tours, not more theory.
 
-TOPIC CATEGORIES:
-- Getting more students with paid ads (Meta/Google)
-- Using AI to qualify leads and respond faster
-- Common mistakes education businesses make with ads
-- How to save time in an education business using AI
-- Mindset and metrics — what to track, what to ignore
+EDUCATION BUSINESS LANGUAGE — always use these terms:
+- "tours" or "centre tours" not "calls" or "meetings"
+- "enrolments" not "sales" or "conversions"
+- "families" or "parents" not "customers" or "clients"
+- "students" not "users" or "leads" (in the context of the people they teach)
+- "enquiries" not "leads" (when talking to the business owner)
+- "centre" not "location" or "branch"
 
-PROOF POINTS (use these naturally in scripts when relevant):
+LANGUAGE STYLE — critical:
+Write the way education business owners actually talk at BNI events, in Facebook group posts, or WhatsApp messages to each other.
+NOT polished. NOT corporate. NOT a blog post read out loud.
+Think: "So I had this centre call me last week..." or "Honestly the number of schools I see doing this..." or "And the frustrating thing is — they've already spent the money."
+Short sentences. Real hesitations. The way a trusted expert talks to a peer, not presents to an audience.
+
+PROOF POINTS — use naturally when they fit:
 - MindChamps Allied Care: $10,000+ spent, zero enrolments with previous agency → first enrolments within 45 days after rebuilding around a defined avatar + AI lead qualification
 - Little Oxford (preschool, 4 locations): $18,000 spent, zero enrolments → 5 new families enrolled in 5 weeks
 - KidoCode (largest coding school in SE Asia): 376 new students, 71% lower cost per student over 10 months
 - IDC (instructional design coach): cohort sold out with 51 enrolments in 21 days (target was 32)
-- Y Suites (student accommodation, Australia): bookings doubled from 87 to 187 with no increase in ad spend
 - Score Campus (enrichment centre): zero return from ads → 4 enrolments in 10 days at 6.6x ROI
 - Achievers Studio (math tuition): enquiries but zero conversions → 8 confirmed enrolments in 30 days after fixing lead quality + AI response speed
 - Eye Level Singapore (23 locations): 1–2 students/month → 39 enrolments over 8 months, cost per lead $35
-- English school (coaching programme client): $581 ad spend → $5,800 in sales (9.9x ROAS), guided through full setup themselves
+- English school (coaching client): $581 ad spend → $5,800 in sales (9.9x ROAS)
 
-EDUCATION BUSINESS LANGUAGE — always use these terms, not generic business terms:
-- "tours" or "centre tours" not "calls" or "meetings"
-- "enrolments" not "sales" or "conversions"
-- "families" or "parents" not "customers" or "clients"
-- "students" not "users" or "leads"
-- "enquiries" not "leads" (unless talking about ad metrics)
-- "centre" not "location" or "branch"
-
-TWO CALLS TO ACTION — choose the right one based on the topic:
-- If topic is about getting more enrolments / ads / agency services: "DM me the word REVIEW and I'll take a free look at your ads — no pitch, just honest feedback."
-- If topic is about AI tools / saving time / DIY: "Join my free AI Education Business group on Facebook — link in bio."
-- If topic fits both: use both, lead with the one that fits best."""
+CTA — every single script ends with a free ad review offer, no exceptions:
+Every topic — no matter what it's about — must be angled to show why the viewer's ads could be improved, and close with:
+"If you want me to take a look at your ads for free, DM me the word REVIEW — or click the link in bio to book a free ad review. No pitch, just honest feedback on what's costing you enrolments."
+Vary the wording slightly each time so it doesn't sound identical across videos, but the offer is always the same: free ad review, DM REVIEW or link in bio."""
 
 
 def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
@@ -60,46 +58,41 @@ def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
 
     context = custom_context.strip() or DEFAULT_CONTEXT
 
-    prompt = f"""You are writing a YouTube Shorts script for Andrej to record on camera. Use his real voice and real proof points — this is not generic content.
+    prompt = f"""You are writing a YouTube Shorts script for Andrej to record on camera. This must sound like him talking — not like a script being read.
 
 INSTRUCTIONS:
 {context}
 
 TOPIC: {topic}
 
-TOP YOUTUBE VIDEOS ON THIS TOPIC:
+TOP YOUTUBE VIDEOS ON THIS TOPIC (for context on what's resonating):
 {video_context}
 
-FORUM & COMMUNITY RESEARCH (pain points, angles, hooks from Reddit/Facebook/online communities):
+COMMUNITY RESEARCH (real pain points and language from Reddit, Quora, LinkedIn, Facebook groups):
 {forum_research}
 
-LANGUAGE STYLE — this is critical:
-Write the way education business owners actually talk at BNI events, in Facebook group posts, or WhatsApp messages to each other.
-NOT polished. NOT corporate. NOT a blog post read out loud.
-Think: "So I had this parent call me last week..." or "Honestly the number of centres I see doing this..." or "And the frustrating thing is — they've already spent the money."
-Short sentences. Real hesitations. The way a trusted expert talks to a peer, not presents to an audience.
-No buzzwords. No "in today's digital landscape". No "it's so important that".
-
 SCRIPT REQUIREMENTS:
-- 60 seconds max, ~150 words at a natural speaking pace
-- Hook: one hard truth or real number from experience. No question openers. No "did you know".
-- Body: 3-4 points. Each one should feel like something Andrej would say mid-conversation — specific, slightly blunt, grounded in what he's actually seen across 120+ businesses.
-- Use a proof point only if it fits naturally — don't force it.
-- CTA: match the topic (ads/enrolments → free ad review, AI/time-saving → Facebook group)
+- Target length: 45–60 seconds when read aloud at a natural, unhurried pace. That is roughly 120–160 words.
+- The script must feel complete — not rushed. Each point needs a beat to land.
+- Hook: a hard truth, a real number, or a specific situation Andrej has seen. No questions. No "did you know". No "in today's world".
+- Body: 4–5 specific points. Each one should feel like something said mid-conversation — grounded in real patterns from 120+ education businesses. Name the mistake, explain why it happens, hint at the fix. Give enough detail that the viewer feels like they're getting real value, not a teaser.
+- Angle every topic toward ads and enrolments — even if the topic is about AI or time-saving, connect it back to how it affects their ability to get more students and tours.
+- Include one proof point naturally if it fits. Don't force it.
+- CTA: always the free ad review offer — vary the wording but the offer is always the same.
 
-Output the script in this format — nothing else:
+Output the script in this exact format — nothing else:
 
 HOOK:
-[1-2 sentences, exactly as spoken]
+[1–2 sentences, exactly as Andrej would say them]
 
 BODY:
-[3-4 short points, each on its own line, exactly as spoken]
+[4–5 points, each on its own line, written as spoken — not bullet points, not headers, just the words]
 
 CTA:
-[1-2 sentences, exactly as spoken]
+[2–3 sentences offering the free ad review — DM REVIEW or link in bio]
 
 ---
-NOTE: [one sentence on why this hook lands for this audience]"""
+NOTE: [one sentence on why this hook works for this specific audience]"""
 
     message = client.messages.create(
         model="claude-sonnet-4-6",
