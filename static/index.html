@@ -62,6 +62,41 @@
   .daily-badge { font-size: 10px; background: #1a1a2e; color: #c4b5fd; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-left: 8px; vertical-align: middle; }
   .winning-hook-box { background: #faf5ff; border: 2px solid #7c3aed; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: #3b0764; line-height: 1.5; }
   .winning-hook-label { font-size: 10px; color: #7c3aed; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+  /* GitHub panel */
+  .gh-panel { background: #fff; border: 1px solid #e2e4e9; border-radius: 16px; padding: 24px 28px; margin-bottom: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .gh-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .gh-panel-title { font-size: 14px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+  .gh-panel-title svg { opacity: 0.6; }
+  .gh-trigger-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .gh-topic-input { flex: 1; min-width: 180px; background: #f9fafb; border: 1px solid #dde1e9; border-radius: 8px; color: #1a1a2e; padding: 9px 13px; font-size: 13px; font-family: inherit; outline: none; }
+  .gh-topic-input:focus { border-color: #7c3aed; }
+  .btn-gh { background: #1a1a2e; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-gh:hover { background: #2d2d50; }
+  .btn-gh:disabled { opacity: 0.5; cursor: not-allowed; }
+  .gh-scripts-list { display: flex; flex-direction: column; gap: 6px; }
+  .gh-script-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #e2e4e9; border-radius: 8px; background: #f9fafb; cursor: pointer; transition: all 0.15s; gap: 10px; }
+  .gh-script-row:hover { border-color: #7c3aed; background: #faf5ff; }
+  .gh-script-row.active { border-color: #7c3aed; background: #faf5ff; }
+  .gh-script-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .gh-script-open { font-size: 11px; color: #7c3aed; }
+  .gh-script-content { margin-top: 10px; font-size: 13px; color: #333; white-space: pre-wrap; background: #f9fafb; border-radius: 8px; padding: 16px; border: 1px solid #e2e4e9; max-height: 500px; overflow-y: auto; line-height: 1.75; display: none; }
+  .gh-script-content.open { display: block; }
+  .gh-runs-list { display: flex; flex-direction: column; gap: 5px; margin-top: 14px; }
+  .gh-run-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #666; padding: 7px 12px; border-radius: 7px; background: #f4f5f7; }
+  .gh-run-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .gh-run-dot.success { background: #16a34a; }
+  .gh-run-dot.failure { background: #dc2626; }
+  .gh-run-dot.running { background: #7c3aed; animation: pulse 1.2s infinite; }
+  .gh-run-dot.pending { background: #d1d5db; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .gh-run-link { margin-left: auto; color: #7c3aed; text-decoration: none; font-size: 11px; }
+  .gh-run-link:hover { text-decoration: underline; }
+  .gh-section-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; }
+  .gh-empty { font-size: 13px; color: #bbb; text-align: center; padding: 20px; }
+  .gh-trigger-success { font-size: 12px; color: #16a34a; padding: 8px 12px; background: #dcfce7; border-radius: 7px; display: none; }
+  .gh-trigger-success.show { display: block; }
+  .gh-error { font-size: 12px; color: #dc2626; padding: 8px 12px; background: #fee2e2; border-radius: 7px; display: none; }
+  .gh-error.show { display: block; }
 </style>
 </head>
 <body>
@@ -94,7 +129,32 @@
     </div>
     <button class="btn" onclick="submitJob()">Research + Write Script</button>
   </div>
-  <div class="jobs-title">Recent Jobs</div>
+  <!-- GitHub Scripts Panel -->
+  <div class="gh-panel">
+    <div class="gh-panel-header">
+      <div class="gh-panel-title">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub Scripts
+      </div>
+      <button class="btn-gh" onclick="refreshScripts()">Refresh</button>
+    </div>
+
+    <div class="gh-section-label">Trigger new script</div>
+    <div class="gh-trigger-row">
+      <input class="gh-topic-input" id="ghTopicInput" placeholder="Leave blank to use today's auto topic" />
+      <button class="btn-gh" id="ghTriggerBtn" onclick="triggerWorkflow()">&#9654; Run Now</button>
+    </div>
+    <div class="gh-trigger-success" id="ghTriggerSuccess">Workflow triggered — check Runs below. Script will be committed to the repo in ~2 minutes.</div>
+    <div class="gh-error" id="ghTriggerError"></div>
+
+    <div class="gh-section-label" style="margin-top:18px;">Past scripts</div>
+    <div class="gh-scripts-list" id="ghScriptsList"><div class="gh-empty">Loading...</div></div>
+
+    <div class="gh-section-label" style="margin-top:18px;">Recent runs</div>
+    <div class="gh-runs-list" id="ghRunsList"><div class="gh-empty">Loading...</div></div>
+  </div>
+
+  <div class="jobs-title">On-demand Jobs</div>
   <div id="jobsList"></div>
 </div>
 
@@ -310,6 +370,140 @@ function showTab(el, jobId, tab) {
 function escHtml(str) {
   return (str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
+
+// ── GitHub panel ──────────────────────────────────────────────────────────────
+
+let openScript = null;
+
+async function triggerWorkflow() {
+  const btn = document.getElementById("ghTriggerBtn");
+  const topic = document.getElementById("ghTopicInput").value.trim();
+  const successEl = document.getElementById("ghTriggerSuccess");
+  const errorEl = document.getElementById("ghTriggerError");
+  successEl.classList.remove("show");
+  errorEl.classList.remove("show");
+  btn.disabled = true;
+  btn.textContent = "Triggering...";
+  try {
+    const res = await fetch("/gh/trigger", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({topic_override: topic}),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      successEl.classList.add("show");
+      document.getElementById("ghTopicInput").value = "";
+      setTimeout(refreshRuns, 4000);
+    } else {
+      errorEl.textContent = `Error: ${data.detail || data.status}. Make sure GITHUB_TOKEN is set in your environment.`;
+      errorEl.classList.add("show");
+    }
+  } catch(e) {
+    errorEl.textContent = `Request failed: ${e.message}`;
+    errorEl.classList.add("show");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "&#9654; Run Now";
+  }
+}
+
+async function refreshScripts() {
+  const el = document.getElementById("ghScriptsList");
+  el.innerHTML = '<div class="gh-empty">Loading...</div>';
+  try {
+    const res = await fetch("/gh/scripts");
+    const data = await res.json();
+    if (!data.scripts || !data.scripts.length) {
+      el.innerHTML = '<div class="gh-empty">No scripts yet — trigger a run above to generate the first one.</div>';
+      return;
+    }
+    el.innerHTML = data.scripts.map(s => `
+      <div>
+        <div class="gh-script-row ${openScript === s.name ? 'active' : ''}" onclick="toggleScript('${s.name}', this)">
+          <span class="gh-script-name">${s.name.replace('.md','')}</span>
+          <span class="gh-script-open">${openScript === s.name ? 'Close' : 'Read script'} &#8594;</span>
+        </div>
+        <div class="gh-script-content ${openScript === s.name ? 'open' : ''}" id="ghContent-${s.name.replace(/\./g,'_')}">Loading...</div>
+      </div>`).join("");
+    // If one was open, reload its content
+    if (openScript) loadScriptContent(openScript);
+  } catch(e) {
+    el.innerHTML = `<div class="gh-empty">Could not load scripts: ${e.message}</div>`;
+  }
+}
+
+async function toggleScript(name, rowEl) {
+  const contentId = "ghContent-" + name.replace(/\./g, '_');
+  const contentEl = document.getElementById(contentId);
+  if (openScript === name) {
+    openScript = null;
+    contentEl.classList.remove("open");
+    rowEl.querySelector('.gh-script-open').textContent = "Read script →";
+    rowEl.classList.remove("active");
+    return;
+  }
+  // Close any previously open
+  document.querySelectorAll('.gh-script-content.open').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.gh-script-row.active').forEach(el => {
+    el.classList.remove('active');
+    el.querySelector('.gh-script-open').textContent = "Read script →";
+  });
+  openScript = name;
+  rowEl.classList.add("active");
+  rowEl.querySelector('.gh-script-open').textContent = "Close →";
+  contentEl.classList.add("open");
+  contentEl.textContent = "Loading...";
+  loadScriptContent(name);
+}
+
+async function loadScriptContent(name) {
+  const contentId = "ghContent-" + name.replace(/\./g, '_');
+  const el = document.getElementById(contentId);
+  if (!el) return;
+  try {
+    const res = await fetch(`/gh/scripts/${name}`);
+    const data = await res.json();
+    el.textContent = data.content || "Empty file.";
+  } catch(e) {
+    el.textContent = `Failed to load: ${e.message}`;
+  }
+}
+
+async function refreshRuns() {
+  const el = document.getElementById("ghRunsList");
+  try {
+    const res = await fetch("/gh/runs");
+    const data = await res.json();
+    if (!data.runs || !data.runs.length) {
+      el.innerHTML = '<div class="gh-empty">No runs yet.</div>';
+      return;
+    }
+    el.innerHTML = data.runs.map(r => {
+      const dotClass = r.conclusion === "success" ? "success"
+        : r.conclusion === "failure" ? "failure"
+        : r.status === "in_progress" || r.status === "queued" ? "running"
+        : "pending";
+      const label = r.conclusion || r.status;
+      const date = new Date(r.created_at).toLocaleString();
+      return `<div class="gh-run-row">
+        <div class="gh-run-dot ${dotClass}"></div>
+        <span>${date}</span>
+        <span style="color:#aaa;">—</span>
+        <span style="text-transform:capitalize;">${label}</span>
+        <a class="gh-run-link" href="${r.html_url}" target="_blank">View &#8599;</a>
+      </div>`;
+    }).join("");
+  } catch(e) {
+    el.innerHTML = `<div class="gh-empty">Could not load runs.</div>`;
+  }
+}
+
+// Initial load of GitHub panel
+refreshScripts();
+refreshRuns();
+// Poll runs every 30s in case one is in progress
+setInterval(refreshRuns, 30000);
 
 loadJobs();
 setInterval(() => {

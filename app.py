@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
@@ -277,3 +278,89 @@ async def download_output(job_id: str):
     if path.exists():
         return FileResponse(path, filename=f"educreative-{job_id}.txt")
     return {"error": "not found"}
+
+
+# ── GitHub Actions integration ────────────────────────────────────────────────
+
+GH_REPO = os.getenv("GITHUB_REPO", "andrejskergat/educreative-os")
+GH_TOKEN = os.getenv("GITHUB_TOKEN", "")
+GH_WORKFLOW = "daily-script.yml"
+GH_BRANCH = "main"
+
+
+async def _gh(method: str, path: str, body: dict | None = None):
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if GH_TOKEN:
+        headers["Authorization"] = f"Bearer {GH_TOKEN}"
+    url = f"https://api.github.com{path}"
+    async with httpx.AsyncClient(timeout=15) as client:
+        fn = getattr(client, method)
+        resp = await fn(url, headers=headers, **({"json": body} if body else {}))
+    return resp
+
+
+@app.post("/gh/trigger")
+async def gh_trigger(request: Request):
+    """Trigger the GitHub Actions daily script workflow."""
+    body = await request.json()
+    topic_override = body.get("topic_override", "")
+    payload = {
+        "ref": GH_BRANCH,
+        "inputs": {"topic_override": topic_override},
+    }
+    resp = await _gh("post", f"/repos/{GH_REPO}/actions/workflows/{GH_WORKFLOW}/dispatches", payload)
+    if resp.status_code == 204:
+        return {"ok": True}
+    return {"ok": False, "status": resp.status_code, "detail": resp.text}
+
+
+@app.get("/gh/runs")
+async def gh_runs():
+    """List recent workflow runs."""
+    resp = await _gh("get", f"/repos/{GH_REPO}/actions/workflows/{GH_WORKFLOW}/runs?per_page=10")
+    if resp.status_code != 200:
+        return {"runs": [], "error": resp.text}
+    data = resp.json()
+    runs = [
+        {
+            "id": r["id"],
+            "status": r["status"],
+            "conclusion": r["conclusion"],
+            "created_at": r["created_at"],
+            "html_url": r["html_url"],
+            "name": r.get("display_title", r.get("name", "")),
+        }
+        for r in data.get("workflow_runs", [])
+    ]
+    return {"runs": runs}
+
+
+@app.get("/gh/scripts")
+async def gh_scripts():
+    """List generated scripts from the scripts/ folder in the repo."""
+    resp = await _gh("get", f"/repos/{GH_REPO}/contents/scripts")
+    if resp.status_code == 404:
+        return {"scripts": []}
+    if resp.status_code != 200:
+        return {"scripts": [], "error": resp.text}
+    files = [
+        {"name": f["name"], "path": f["path"], "download_url": f["download_url"]}
+        for f in resp.json()
+        if f["name"].endswith(".md")
+    ]
+    files.sort(key=lambda x: x["name"], reverse=True)
+    return {"scripts": files}
+
+
+@app.get("/gh/scripts/{filename}")
+async def gh_script_content(filename: str):
+    """Fetch content of a specific script file."""
+    resp = await _gh("get", f"/repos/{GH_REPO}/contents/scripts/{filename}")
+    if resp.status_code != 200:
+        return {"error": "not found"}
+    import base64
+    content = base64.b64decode(resp.json()["content"]).decode("utf-8")
+    return {"filename": filename, "content": content}
