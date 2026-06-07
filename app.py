@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+Path("outputs").mkdir(exist_ok=True)
 app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
 DB = "jobs.db"
