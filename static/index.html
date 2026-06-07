@@ -3,513 +3,419 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduCreative AI</title>
+<title>EduCreative — Script Generator</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; min-height: 100vh; }
-  header { padding: 20px 32px; border-bottom: 1px solid #e2e4e9; background: #fff; display: flex; align-items: center; gap: 12px; }
-  header h1 { font-size: 20px; font-weight: 700; color: #1a1a2e; }
-  header span { font-size: 12px; background: #7c3aed; color: #fff; padding: 2px 10px; border-radius: 999px; font-weight: 500; }
-  .container { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
-  .input-card { background: #fff; border: 1px solid #e2e4e9; border-radius: 16px; padding: 28px; margin-bottom: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-  .input-card h2 { font-size: 15px; color: #666; margin-bottom: 16px; font-weight: 500; }
-  textarea { width: 100%; background: #f9fafb; border: 1px solid #dde1e9; border-radius: 10px; color: #1a1a2e; padding: 14px 16px; font-size: 15px; resize: none; height: 80px; font-family: inherit; outline: none; transition: border-color 0.2s; }
-  textarea:focus { border-color: #7c3aed; background: #fff; }
-  .btn { background: #7c3aed; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 12px; }
-  .btn:hover { background: #6d28d9; }
-  .btn:disabled { background: #c4b5fd; cursor: not-allowed; }
-  .jobs-title { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; font-weight: 600; }
-  .job-card { background: #fff; border: 1px solid #e2e4e9; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-  .job-topic { font-size: 15px; font-weight: 600; color: #1a1a2e; flex: 1; }
-  .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
-  .badge-queued { background: #f0f0f0; color: #888; }
-  .badge-done { background: #dcfce7; color: #16a34a; }
-  .badge-error { background: #fee2e2; color: #dc2626; }
-  .badge-running { background: #ede9fe; color: #7c3aed; }
-  .progress { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-  .step { font-size: 12px; padding: 4px 10px; border-radius: 6px; background: #f4f5f7; color: #aaa; border: 1px solid #e2e4e9; }
-  .step.active { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
-  .step.done { background: #dcfce7; color: #16a34a; border-color: #bbf7d0; }
-  .job-meta { font-size: 12px; color: #aaa; }
-  .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
-  .action-btn { font-size: 12px; padding: 6px 14px; border-radius: 7px; border: 1px solid #dde1e9; background: #f9fafb; color: #555; cursor: pointer; text-decoration: none; transition: all 0.2s; font-family: inherit; }
-  .action-btn:hover { border-color: #7c3aed; color: #7c3aed; background: #faf5ff; }
-  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .action-btn.generating { border-color: #c4b5fd; color: #7c3aed; background: #faf5ff; }
-  .output-section { margin-top: 16px; border-top: 1px solid #f0f0f0; padding-top: 16px; }
-  .output-text { font-size: 13px; color: #333; white-space: pre-wrap; background: #f9fafb; border-radius: 8px; padding: 14px; border: 1px solid #e2e4e9; max-height: 420px; overflow-y: auto; line-height: 1.7; user-select: text; cursor: text; }
-  .tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
-  .tab { font-size: 12px; padding: 5px 14px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e4e9; background: #f4f5f7; color: #888; font-weight: 500; transition: all 0.15s; }
-  .tab:hover { border-color: #c4b5fd; color: #7c3aed; }
-  .tab.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
-  .empty { text-align: center; padding: 48px; color: #bbb; font-size: 14px; }
-  .settings-toggle { font-size: 12px; color: #999; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-top: 16px; user-select: none; }
-  .settings-toggle:hover { color: #7c3aed; }
-  .settings-panel { display: none; margin-top: 16px; border-top: 1px solid #f0f0f0; padding-top: 16px; }
-  .settings-panel.open { display: block; }
-  .agent-setting { margin-bottom: 16px; }
-  .agent-setting label { font-size: 12px; color: #666; display: block; margin-bottom: 6px; font-weight: 600; }
-  .agent-setting small { font-size: 11px; color: #aaa; display: block; margin-bottom: 6px; }
-  .agent-setting textarea { height: 60px; font-size: 13px; }
-  .copy-btn { font-size: 11px; padding: 3px 10px; border-radius: 5px; border: 1px solid #e2e4e9; background: #f4f5f7; color: #999; cursor: pointer; float: right; margin-bottom: 6px; font-family: inherit; }
-  .copy-btn:hover { border-color: #7c3aed; color: #7c3aed; }
-  .copy-btn.copied { border-color: #16a34a; color: #16a34a; background: #dcfce7; }
-  .manual-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid #f0f0f0; }
-  .manual-label { font-size: 11px; color: #bbb; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-  .btn-daily { background: #1a1a2e; margin-top: 0; font-size: 13px; padding: 9px 18px; }
-  .btn-daily:hover { background: #2d2d50; }
-  .daily-badge { font-size: 10px; background: #1a1a2e; color: #c4b5fd; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-left: 8px; vertical-align: middle; }
-  .winning-hook-box { background: #faf5ff; border: 2px solid #7c3aed; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: #3b0764; line-height: 1.5; }
-  .winning-hook-label { font-size: 10px; color: #7c3aed; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
-  /* GitHub panel */
-  .gh-panel { background: #fff; border: 1px solid #e2e4e9; border-radius: 16px; padding: 24px 28px; margin-bottom: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-  .gh-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
-  .gh-panel-title { font-size: 14px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
-  .gh-panel-title svg { opacity: 0.6; }
-  .gh-trigger-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .gh-topic-input { flex: 1; min-width: 180px; background: #f9fafb; border: 1px solid #dde1e9; border-radius: 8px; color: #1a1a2e; padding: 9px 13px; font-size: 13px; font-family: inherit; outline: none; }
-  .gh-topic-input:focus { border-color: #7c3aed; }
-  .btn-gh { background: #1a1a2e; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .btn-gh:hover { background: #2d2d50; }
-  .btn-gh:disabled { opacity: 0.5; cursor: not-allowed; }
-  .gh-scripts-list { display: flex; flex-direction: column; gap: 6px; }
-  .gh-script-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #e2e4e9; border-radius: 8px; background: #f9fafb; cursor: pointer; transition: all 0.15s; gap: 10px; }
-  .gh-script-row:hover { border-color: #7c3aed; background: #faf5ff; }
-  .gh-script-row.active { border-color: #7c3aed; background: #faf5ff; }
-  .gh-script-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
-  .gh-script-open { font-size: 11px; color: #7c3aed; }
-  .gh-script-content { margin-top: 10px; font-size: 13px; color: #333; white-space: pre-wrap; background: #f9fafb; border-radius: 8px; padding: 16px; border: 1px solid #e2e4e9; max-height: 500px; overflow-y: auto; line-height: 1.75; display: none; }
-  .gh-script-content.open { display: block; }
-  .gh-runs-list { display: flex; flex-direction: column; gap: 5px; margin-top: 14px; }
-  .gh-run-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #666; padding: 7px 12px; border-radius: 7px; background: #f4f5f7; }
-  .gh-run-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .gh-run-dot.success { background: #16a34a; }
-  .gh-run-dot.failure { background: #dc2626; }
-  .gh-run-dot.running { background: #7c3aed; animation: pulse 1.2s infinite; }
-  .gh-run-dot.pending { background: #d1d5db; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .gh-run-link { margin-left: auto; color: #7c3aed; text-decoration: none; font-size: 11px; }
-  .gh-run-link:hover { text-decoration: underline; }
-  .gh-section-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; }
-  .gh-empty { font-size: 13px; color: #bbb; text-align: center; padding: 20px; }
-  .gh-trigger-success { font-size: 12px; color: #16a34a; padding: 8px 12px; background: #dcfce7; border-radius: 7px; display: none; }
-  .gh-trigger-success.show { display: block; }
-  .gh-error { font-size: 12px; color: #dc2626; padding: 8px 12px; background: #fee2e2; border-radius: 7px; display: none; }
-  .gh-error.show { display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; min-height: 100vh; }
+
+header { padding: 18px 32px; border-bottom: 1px solid #e2e4e9; background: #fff; display: flex; align-items: center; gap: 12px; }
+header h1 { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+header span { font-size: 11px; background: #7c3aed; color: #fff; padding: 2px 10px; border-radius: 999px; font-weight: 600; }
+
+.container { max-width: 780px; margin: 0 auto; padding: 36px 24px; }
+
+/* Step cards */
+.step-card {
+  background: #fff;
+  border: 1px solid #e2e4e9;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.step-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
+}
+.step-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+}
+
+/* Input */
+.topic-input {
+  width: 100%;
+  background: #f9fafb;
+  border: 1.5px solid #e2e4e9;
+  border-radius: 10px;
+  color: #1a1a2e;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+  height: 72px;
+}
+.topic-input:focus { border-color: #7c3aed; background: #fff; }
+
+/* Buttons */
+.btn {
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:hover { background: #6d28d9; }
+.btn:disabled { background: #c4b5fd; cursor: not-allowed; }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid #7c3aed;
+  color: #7c3aed;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn-outline:hover { background: #faf5ff; }
+
+/* Loading */
+.loader {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 14px;
+  color: #7c3aed;
+}
+.loader.show { display: flex; }
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid #e9d5ff;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hook list */
+.hooks-section { display: none; margin-top: 6px; }
+.hooks-section.show { display: block; }
+.hooks-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.hook-card {
+  border: 1.5px solid #e2e4e9;
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #1a1a2e;
+  background: #f9fafb;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.hook-card:hover { border-color: #7c3aed; background: #faf5ff; }
+.hook-card.selected { border-color: #7c3aed; background: #faf5ff; box-shadow: 0 0 0 3px #ede9fe; }
+.hook-num { font-size: 11px; font-weight: 700; color: #c4b5fd; min-width: 18px; margin-top: 2px; }
+.hook-text { flex: 1; }
+.hook-check { font-size: 16px; color: #7c3aed; display: none; }
+.hook-card.selected .hook-check { display: block; }
+
+/* Selected hook display */
+.selected-hook-box {
+  background: #faf5ff;
+  border: 2px solid #7c3aed;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #3b0764;
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+.selected-hook-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+/* Script output */
+.script-section { display: none; }
+.script-section.show { display: block; }
+.script-box {
+  background: #f9fafb;
+  border: 1.5px solid #e2e4e9;
+  border-radius: 10px;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  color: #1a1a2e;
+  max-height: 520px;
+  overflow-y: auto;
+  user-select: text;
+  cursor: text;
+}
+.script-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.copy-btn {
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e4e9;
+  background: #f4f5f7;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.copy-btn:hover { border-color: #7c3aed; color: #7c3aed; }
+.copy-btn.copied { border-color: #16a34a; color: #16a34a; background: #dcfce7; }
+
+/* Topic suggestion */
+.topic-suggestion {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 8px;
+}
+.topic-suggestion span {
+  color: #7c3aed;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Step 2 locked state */
+.step-card.locked { opacity: 0.45; pointer-events: none; }
+.step-card.locked .step-label { color: #bbb; }
 </style>
 </head>
 <body>
+
 <header>
   <h1>EduCreative AI</h1>
-  <span>YouTube Shorts Pipeline</span>
+  <span>Script Generator</span>
 </header>
+
 <div class="container">
-  <div class="input-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-      <h2 style="margin:0;">What do you want to create today?</h2>
-      <button class="btn btn-daily" onclick="generateDaily()" id="dailyBtn">&#9654; Generate Daily Script</button>
-    </div>
-    <div id="dailyTopicBanner" style="display:none;background:#f5f0ff;border:1px solid #c4b5fd;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#5b21b6;"></div>
-    <textarea id="topicInput" placeholder="e.g. Why your education business ads aren't converting — or click Generate Daily Script to auto-pick today's topic"></textarea>
-    <div class="settings-toggle" onclick="toggleSettings()">
-      <span id="settingsArrow">&#9658;</span> Agent Settings (optional)
-    </div>
-    <div class="settings-panel" id="settingsPanel">
-      <div class="agent-setting">
-        <label>Script Writer — Extra Context</label>
-        <small>Override brand voice, audience, or style for this job</small>
-        <textarea id="scriptContext" placeholder="e.g. Focus on preschool owners specifically. Use the MindChamps case study as the hook."></textarea>
-      </div>
-      <div class="agent-setting">
-        <label>Thumbnail Designer — Extra Context</label>
-        <small>Override colours, style or layout for this job</small>
-        <textarea id="thumbnailContext" placeholder="e.g. Use purple #7c3aed instead of cyan. Bold sans-serif. Split-screen layout."></textarea>
-      </div>
-    </div>
-    <button class="btn" onclick="submitJob()">Research + Write Script</button>
-  </div>
-  <!-- GitHub Scripts Panel -->
-  <div class="gh-panel">
-    <div class="gh-panel-header">
-      <div class="gh-panel-title">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub Scripts
-      </div>
-      <button class="btn-gh" onclick="refreshScripts()">Refresh</button>
+
+  <!-- STEP 1: Research + Hooks -->
+  <div class="step-card" id="step1">
+    <div class="step-label">Step 1</div>
+    <div class="step-title">Enter a topic — or leave blank for today's auto-topic</div>
+
+    <textarea class="topic-input" id="topicInput"
+      placeholder="e.g. Why your education ads get clicks but zero enrolments&#10;Leave blank to use today's auto-topic from the bank"></textarea>
+
+    <div class="topic-suggestion" id="topicHint"></div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button class="btn" id="researchBtn" onclick="doResearch()">
+        <span>Research &amp; Suggest Hooks</span>
+      </button>
     </div>
 
-    <div class="gh-section-label">Trigger new script</div>
-    <div class="gh-trigger-row">
-      <input class="gh-topic-input" id="ghTopicInput" placeholder="Leave blank to use today's auto topic" />
-      <button class="btn-gh" id="ghTriggerBtn" onclick="triggerWorkflow()">&#9654; Run Now</button>
+    <div class="loader" id="researchLoader">
+      <div class="spinner"></div>
+      <span id="researchLoaderMsg">Researching topic and generating hooks...</span>
     </div>
-    <div class="gh-trigger-success" id="ghTriggerSuccess">Workflow triggered — check Runs below. Script will be committed to the repo in ~2 minutes.</div>
-    <div class="gh-error" id="ghTriggerError"></div>
 
-    <div class="gh-section-label" style="margin-top:18px;">Past scripts</div>
-    <div class="gh-scripts-list" id="ghScriptsList"><div class="gh-empty">Loading...</div></div>
-
-    <div class="gh-section-label" style="margin-top:18px;">Recent runs</div>
-    <div class="gh-runs-list" id="ghRunsList"><div class="gh-empty">Loading...</div></div>
+    <!-- Hook results -->
+    <div class="hooks-section" id="hooksSection">
+      <div style="margin-top:20px; margin-bottom:10px; font-size:13px; color:#666;">
+        Pick the hook that hits hardest — then click <strong>Write Script</strong> below.
+      </div>
+      <div class="hooks-grid" id="hooksGrid"></div>
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <button class="btn" id="writeBtn" onclick="doWrite()" disabled>Write Script with this Hook</button>
+        <button class="btn-outline" onclick="doResearch()">Regenerate Hooks</button>
+      </div>
+    </div>
   </div>
 
-  <div class="jobs-title">On-demand Jobs</div>
-  <div id="jobsList"></div>
+  <!-- STEP 2: Script -->
+  <div class="step-card locked" id="step2">
+    <div class="step-label">Step 2</div>
+    <div class="step-title">Your Script</div>
+
+    <div class="loader" id="writeLoader">
+      <div class="spinner"></div>
+      <span>Writing your script...</span>
+    </div>
+
+    <div class="script-section" id="scriptSection">
+      <div class="selected-hook-label">Hook used</div>
+      <div class="selected-hook-box" id="hookUsed"></div>
+      <div class="script-box" id="scriptBox"></div>
+      <div class="script-actions">
+        <button class="copy-btn" id="copyBtn" onclick="copyScript()">Copy Script</button>
+        <button class="btn-outline" onclick="resetAll()" style="font-size:13px;padding:8px 18px;">Start Over</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-const STEPS = ["Research", "Hooks", "Script"];
-const STATUS_STEPS = { queued: -1, researching: 0, hooks: 1, scripting: 2, done: 3, error: -2 };
-let jobs = {};
-let activeStreams = new Set();
+let currentTopic = "";
+let selectedHook = null;
 
-function toggleSettings() {
-  const panel = document.getElementById("settingsPanel");
-  const arrow = document.getElementById("settingsArrow");
-  panel.classList.toggle("open");
-  arrow.innerHTML = panel.classList.contains("open") ? "&#9660;" : "&#9658;";
-}
-
-async function submitJob() {
-  const topic = document.getElementById("topicInput").value.trim();
-  if (!topic) return;
-  const script_context = document.getElementById("scriptContext").value.trim();
-  const thumbnail_context = document.getElementById("thumbnailContext").value.trim();
-  document.querySelector(".btn").disabled = true;
-  const res = await fetch("/jobs", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({topic, script_context, thumbnail_context}) });
-  const data = await res.json();
-  document.getElementById("topicInput").value = "";
-  document.querySelector(".btn").disabled = false;
-  const job = await (await fetch(`/jobs/${data.job_id}`)).json();
-  jobs[job.id] = job;
-  renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
-  streamJob(data.job_id);
-}
-
-async function generateDaily() {
-  const btn = document.getElementById("dailyBtn");
-  btn.disabled = true;
-  btn.textContent = "Generating...";
+// Load today's topic hint
+async function loadTodayTopic() {
   try {
-    const res = await fetch("/daily", { method: "POST" });
+    const res = await fetch("/topics");
     const data = await res.json();
-    const banner = document.getElementById("dailyTopicBanner");
-    banner.style.display = "block";
-    banner.innerHTML = `<strong>Today's topic:</strong> ${escHtml(data.topic)}${data.already_exists ? " <em>(already generated today — scroll down)</em>" : ""}`;
-    if (!data.already_exists) {
-      const job = await (await fetch(`/jobs/${data.job_id}`)).json();
-      jobs[job.id] = job;
-      renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
-      streamJob(data.job_id);
-    }
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = "&#9654; Generate Daily Script";
-  }
+    const hint = document.getElementById("topicHint");
+    hint.innerHTML = `Today's auto-topic: <span onclick="useTopic('${escAttr(data.today)}')">${escHtml(data.today)}</span>`;
+  } catch(e) {}
 }
 
-function streamJob(jobId) {
-  if (activeStreams.has(jobId)) return;
-  activeStreams.add(jobId);
-  const es = new EventSource(`/jobs/${jobId}/stream`);
-  es.addEventListener("progress", () => updateJobCard(jobId));
-  es.addEventListener("done", () => { es.close(); activeStreams.delete(jobId); updateJobCard(jobId); });
-  es.addEventListener("error", () => { es.close(); activeStreams.delete(jobId); updateJobCard(jobId); });
+function useTopic(topic) {
+  document.getElementById("topicInput").value = topic;
 }
 
-async function loadJobs() {
-  const res = await fetch("/jobs");
-  const data = await res.json();
-  data.forEach(j => {
-    if (!jobs[j.id] || jobs[j.id].status !== "done") {
-      jobs[j.id] = j;
-      if (j.status !== "done" && j.status !== "error") streamJob(j.id);
-    }
-  });
-  renderJobs(data);
-}
+async function doResearch() {
+  const topic = document.getElementById("topicInput").value.trim();
+  const btn = document.getElementById("researchBtn");
+  const loader = document.getElementById("researchLoader");
+  const hooksSection = document.getElementById("hooksSection");
 
-async function updateJobCard(jobId) {
-  const res = await fetch(`/jobs/${jobId}`);
-  const job = await res.json();
-  jobs[jobId] = job;
-  const el = document.getElementById(`job-${jobId}`);
-  if (el) {
-    const scroll = window.scrollY;
-    el.outerHTML = renderJob(job);
-    window.scrollTo(0, scroll);
-  }
-}
-
-async function generateThumbnail(jobId, btn) {
   btn.disabled = true;
-  btn.classList.add("generating");
-  btn.textContent = "Generating...";
-  await fetch(`/jobs/${jobId}/thumbnail`, { method: "POST" });
-  await updateJobCard(jobId);
-}
+  loader.classList.add("show");
+  hooksSection.classList.remove("show");
+  selectedHook = null;
+  document.getElementById("writeBtn").disabled = true;
+  document.getElementById("step2").classList.add("locked");
+  document.getElementById("scriptSection").classList.remove("show");
+  document.getElementById("writeLoader").classList.remove("show");
 
-async function generateDescription(jobId, btn) {
-  btn.disabled = true;
-  btn.classList.add("generating");
-  btn.textContent = "Generating...";
-  await fetch(`/jobs/${jobId}/description`, { method: "POST" });
-  await updateJobCard(jobId);
-}
-
-function renderJobs(jobList) {
-  const el = document.getElementById("jobsList");
-  const scroll = window.scrollY;
-  if (!jobList.length) { el.innerHTML = '<div class="empty">No jobs yet. Type a topic above to get started.</div>'; return; }
-  el.innerHTML = jobList.map(renderJob).join("");
-  window.scrollTo(0, scroll);
-}
-
-function copyText(id, btn) {
-  const el = document.getElementById(id);
-  navigator.clipboard.writeText(el.innerText).then(() => {
-    btn.textContent = "Copied!";
-    btn.classList.add("copied");
-    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
-  });
-}
-
-function renderJob(job) {
-  const stepIdx = STATUS_STEPS[job.status] ?? -1;
-  const badgeClass = job.status === "done" ? "badge-done" : job.status === "error" ? "badge-error" : stepIdx >= 0 ? "badge-running" : "badge-queued";
-  const badgeLabel = job.status === "done" ? "Complete" : job.status === "error" ? "Error" : job.status === "queued" ? "Queued" : "Running...";
-  const date = new Date(job.created_at).toLocaleString();
-  const steps = STEPS.map((s, i) => {
-    const cls = i < stepIdx ? "done" : i === stepIdx ? "active" : "";
-    return `<div class="step ${cls}">${i < stepIdx ? "&#10003; " : ""}${s}</div>`;
-  }).join("");
-
-  let outputs = "";
-  if (job.status === "done" || job.thumbnail || job.description || job.script || job.hook_variants) {
-    const tabs = [
-      { key: "script", label: "Script", show: !!job.script },
-      { key: "hooks", label: "Hook Variants", show: !!job.hook_variants },
-      { key: "thumbnail", label: "Thumbnail", show: !!job.thumbnail },
-      { key: "description", label: "Description", show: !!job.description },
-      { key: "research", label: "Research", show: !!job.research },
-    ].filter(t => t.show);
-
-    const firstTab = tabs[0]?.key || "script";
-
-    const tabHtml = tabs.map((t, i) =>
-      `<div class="tab ${i === 0 ? 'active' : ''}" onclick="showTab(this,'${job.id}','${t.key}')">${t.label}</div>`
-    ).join("");
-
-    const winningHookHtml = job.winning_hook ? `
-      <div class="winning-hook-box">
-        <div class="winning-hook-label">&#9733; Winning Hook</div>
-        ${escHtml(job.winning_hook)}
-      </div>` : "";
-
-    const contentHtml = `
-      <div id="tab-${job.id}-script" ${firstTab !== 'script' ? 'style="display:none"' : ''}>
-        ${winningHookHtml}
-        <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
-        <div id="script-text-${job.id}" class="output-text">${escHtml(job.script || "")}</div>
-      </div>
-      <div id="tab-${job.id}-hooks" style="display:${job.hook_variants ? (firstTab === 'hooks' ? 'block' : 'none') : 'none'}">
-        <button class="copy-btn" onclick="copyText('hooks-text-${job.id}', this)">Copy</button>
-        <div id="hooks-text-${job.id}" class="output-text">${escHtml(job.hook_variants || "")}</div>
-      </div>
-      <div id="tab-${job.id}-thumbnail" style="display:${job.thumbnail ? (firstTab === 'thumbnail' ? 'block' : 'none') : 'none'}">
-        <button class="copy-btn" onclick="copyText('thumb-text-${job.id}', this)">Copy</button>
-        <div id="thumb-text-${job.id}" class="output-text">${escHtml(job.thumbnail || "")}</div>
-        ${job.canva_url ? `<a class="action-btn" href="${escHtml(job.canva_url)}" target="_blank" style="margin-top:8px;display:inline-block;border-color:#7c3aed;color:#c4b5fd;">Open in Canva &#8599;</a>` : ""}
-      </div>
-      <div id="tab-${job.id}-description" style="display:${job.description ? (firstTab === 'description' ? 'block' : 'none') : 'none'}">
-        <button class="copy-btn" onclick="copyText('desc-text-${job.id}', this)">Copy</button>
-        <div id="desc-text-${job.id}" class="output-text">${escHtml(job.description || "")}</div>
-      </div>
-      <div id="tab-${job.id}-research" style="display:${job.research ? (firstTab === 'research' ? 'block' : 'none') : 'none'}">
-        <button class="copy-btn" onclick="copyText('research-text-${job.id}', this)">Copy</button>
-        <div id="research-text-${job.id}" class="output-text">${escHtml(job.research || "")}</div>
-      </div>`;
-
-    const manualButtons = job.status === "done" ? `
-      <div class="manual-section">
-        <div class="manual-label">Generate on demand</div>
-        <div class="actions">
-          <button class="action-btn" onclick="generateThumbnail('${job.id}', this)">${job.thumbnail ? "Regenerate Thumbnail" : "Generate Thumbnail"}</button>
-          <button class="action-btn" onclick="generateDescription('${job.id}', this)">${job.description ? "Regenerate Description" : "Generate Description"}</button>
-          <a class="action-btn" href="/outputs/${job.id}.txt" download>Download All</a>
-        </div>
-      </div>` : "";
-
-    outputs = `
-      <div class="output-section">
-        <div class="tabs">${tabHtml}</div>
-        ${contentHtml}
-      </div>
-      ${manualButtons}`;
-  }
-
-  const dailyBadge = job.is_daily ? `<span class="daily-badge">Daily</span>` : "";
-  return `<div class="job-card" id="job-${job.id}">
-    <div class="job-header"><div class="job-topic">${escHtml(job.topic)}${dailyBadge}</div><span class="badge ${badgeClass}">${badgeLabel}</span></div>
-    <div class="progress">${steps}</div>
-    <div class="job-meta">${date} &middot; ID: ${job.id}</div>
-    ${outputs}
-  </div>`;
-}
-
-function showTab(el, jobId, tab) {
-  el.closest('.output-section').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  ['script','hooks','thumbnail','description','research'].forEach(t => {
-    const el = document.getElementById(`tab-${jobId}-${t}`);
-    if (el) el.style.display = t === tab ? 'block' : 'none';
-  });
-}
-
-function escHtml(str) {
-  return (str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-// ── GitHub panel ──────────────────────────────────────────────────────────────
-
-let openScript = null;
-
-async function triggerWorkflow() {
-  const btn = document.getElementById("ghTriggerBtn");
-  const topic = document.getElementById("ghTopicInput").value.trim();
-  const successEl = document.getElementById("ghTriggerSuccess");
-  const errorEl = document.getElementById("ghTriggerError");
-  successEl.classList.remove("show");
-  errorEl.classList.remove("show");
-  btn.disabled = true;
-  btn.textContent = "Triggering...";
   try {
-    const res = await fetch("/gh/trigger", {
+    const res = await fetch("/research", {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({topic_override: topic}),
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({topic}),
     });
     const data = await res.json();
-    if (data.ok) {
-      successEl.classList.add("show");
-      document.getElementById("ghTopicInput").value = "";
-      setTimeout(refreshRuns, 4000);
-    } else {
-      errorEl.textContent = `Error: ${data.detail || data.status}. Make sure GITHUB_TOKEN is set in your environment.`;
-      errorEl.classList.add("show");
-    }
+    if (data.error) throw new Error(data.error);
+
+    currentTopic = data.topic;
+    document.getElementById("topicInput").value = data.topic;
+    renderHooks(data.hooks);
+    hooksSection.classList.add("show");
   } catch(e) {
-    errorEl.textContent = `Request failed: ${e.message}`;
-    errorEl.classList.add("show");
+    alert("Research failed: " + e.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = "&#9654; Run Now";
+    loader.classList.remove("show");
   }
 }
 
-async function refreshScripts() {
-  const el = document.getElementById("ghScriptsList");
-  el.innerHTML = '<div class="gh-empty">Loading...</div>';
+function renderHooks(hooks) {
+  const grid = document.getElementById("hooksGrid");
+  grid.innerHTML = hooks.map((h, i) => `
+    <div class="hook-card" id="hook-${i}" onclick="selectHook(${i}, this)">
+      <span class="hook-num">${i + 1}</span>
+      <span class="hook-text">${escHtml(h)}</span>
+      <span class="hook-check">&#10003;</span>
+    </div>
+  `).join("");
+  // Store hooks on the grid element
+  grid._hooks = hooks;
+}
+
+function selectHook(idx, el) {
+  document.querySelectorAll(".hook-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedHook = document.getElementById("hooksGrid")._hooks[idx];
+  document.getElementById("writeBtn").disabled = false;
+}
+
+async function doWrite() {
+  if (!selectedHook || !currentTopic) return;
+
+  const btn = document.getElementById("writeBtn");
+  const step2 = document.getElementById("step2");
+  const loader = document.getElementById("writeLoader");
+  const scriptSection = document.getElementById("scriptSection");
+
+  btn.disabled = true;
+  step2.classList.remove("locked");
+  loader.classList.add("show");
+  scriptSection.classList.remove("show");
+
+  // Scroll to step 2
+  step2.scrollIntoView({behavior: "smooth", block: "start"});
+
   try {
-    const res = await fetch("/gh/scripts");
+    const res = await fetch("/write", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({topic: currentTopic, hook: selectedHook}),
+    });
     const data = await res.json();
-    if (!data.scripts || !data.scripts.length) {
-      el.innerHTML = '<div class="gh-empty">No scripts yet — trigger a run above to generate the first one.</div>';
-      return;
-    }
-    el.innerHTML = data.scripts.map(s => `
-      <div>
-        <div class="gh-script-row ${openScript === s.name ? 'active' : ''}" onclick="toggleScript('${s.name}', this)">
-          <span class="gh-script-name">${s.name.replace('.md','')}</span>
-          <span class="gh-script-open">${openScript === s.name ? 'Close' : 'Read script'} &#8594;</span>
-        </div>
-        <div class="gh-script-content ${openScript === s.name ? 'open' : ''}" id="ghContent-${s.name.replace(/\./g,'_')}">Loading...</div>
-      </div>`).join("");
-    // If one was open, reload its content
-    if (openScript) loadScriptContent(openScript);
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById("hookUsed").textContent = selectedHook;
+    document.getElementById("scriptBox").textContent = data.script;
+    scriptSection.classList.add("show");
   } catch(e) {
-    el.innerHTML = `<div class="gh-empty">Could not load scripts: ${e.message}</div>`;
+    alert("Write failed: " + e.message);
+    step2.classList.add("locked");
+  } finally {
+    loader.classList.remove("show");
+    btn.disabled = false;
   }
 }
 
-async function toggleScript(name, rowEl) {
-  const contentId = "ghContent-" + name.replace(/\./g, '_');
-  const contentEl = document.getElementById(contentId);
-  if (openScript === name) {
-    openScript = null;
-    contentEl.classList.remove("open");
-    rowEl.querySelector('.gh-script-open').textContent = "Read script →";
-    rowEl.classList.remove("active");
-    return;
-  }
-  // Close any previously open
-  document.querySelectorAll('.gh-script-content.open').forEach(el => el.classList.remove('open'));
-  document.querySelectorAll('.gh-script-row.active').forEach(el => {
-    el.classList.remove('active');
-    el.querySelector('.gh-script-open').textContent = "Read script →";
+function copyScript() {
+  const text = document.getElementById("scriptBox").textContent;
+  const btn = document.getElementById("copyBtn");
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy Script"; btn.classList.remove("copied"); }, 2000);
   });
-  openScript = name;
-  rowEl.classList.add("active");
-  rowEl.querySelector('.gh-script-open').textContent = "Close →";
-  contentEl.classList.add("open");
-  contentEl.textContent = "Loading...";
-  loadScriptContent(name);
 }
 
-async function loadScriptContent(name) {
-  const contentId = "ghContent-" + name.replace(/\./g, '_');
-  const el = document.getElementById(contentId);
-  if (!el) return;
-  try {
-    const res = await fetch(`/gh/scripts/${name}`);
-    const data = await res.json();
-    el.textContent = data.content || "Empty file.";
-  } catch(e) {
-    el.textContent = `Failed to load: ${e.message}`;
-  }
+function resetAll() {
+  document.getElementById("topicInput").value = "";
+  document.getElementById("hooksSection").classList.remove("show");
+  document.getElementById("scriptSection").classList.remove("show");
+  document.getElementById("writeLoader").classList.remove("show");
+  document.getElementById("step2").classList.add("locked");
+  document.getElementById("writeBtn").disabled = true;
+  selectedHook = null;
+  currentTopic = "";
+  window.scrollTo({top: 0, behavior: "smooth"});
 }
 
-async function refreshRuns() {
-  const el = document.getElementById("ghRunsList");
-  try {
-    const res = await fetch("/gh/runs");
-    const data = await res.json();
-    if (!data.runs || !data.runs.length) {
-      el.innerHTML = '<div class="gh-empty">No runs yet.</div>';
-      return;
-    }
-    el.innerHTML = data.runs.map(r => {
-      const dotClass = r.conclusion === "success" ? "success"
-        : r.conclusion === "failure" ? "failure"
-        : r.status === "in_progress" || r.status === "queued" ? "running"
-        : "pending";
-      const label = r.conclusion || r.status;
-      const date = new Date(r.created_at).toLocaleString();
-      return `<div class="gh-run-row">
-        <div class="gh-run-dot ${dotClass}"></div>
-        <span>${date}</span>
-        <span style="color:#aaa;">—</span>
-        <span style="text-transform:capitalize;">${label}</span>
-        <a class="gh-run-link" href="${r.html_url}" target="_blank">View &#8599;</a>
-      </div>`;
-    }).join("");
-  } catch(e) {
-    el.innerHTML = `<div class="gh-empty">Could not load runs.</div>`;
-  }
+function escHtml(s) {
+  return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function escAttr(s) {
+  return (s||"").replace(/'/g,"\\'");
 }
 
-// Initial load of GitHub panel
-refreshScripts();
-refreshRuns();
-// Poll runs every 30s in case one is in progress
-setInterval(refreshRuns, 30000);
-
-loadJobs();
-setInterval(() => {
-  const hasRunning = Object.values(jobs).some(j => j.status !== "done" && j.status !== "error");
-  if (hasRunning) loadJobs();
-}, 3000);
+loadTodayTopic();
 </script>
 </body>
 </html>
