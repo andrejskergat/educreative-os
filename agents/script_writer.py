@@ -45,7 +45,7 @@ Every topic — no matter what it's about — must be angled to show why the vie
 Vary the wording slightly each time so it doesn't sound identical across videos, but the offer is always the same: free ad review, DM REVIEW or link in bio."""
 
 
-def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
+def run(topic: str, youtube_data: dict, custom_context: str = "", winning_hook: str = "") -> dict:
     client = anthropic.Anthropic()
 
     top_videos = youtube_data.get("videos", [])[:5]
@@ -57,6 +57,13 @@ def run(topic: str, youtube_data: dict, custom_context: str = "") -> dict:
     forum_research = youtube_data.get("forum_research", "")
 
     context = custom_context.strip() or DEFAULT_CONTEXT
+
+    hook_instruction = f"""WINNING HOOK (already selected — use this EXACTLY as the opening, word for word):
+{winning_hook}
+
+Do NOT rewrite or paraphrase the hook. Begin the script with it verbatim.
+
+""" if winning_hook else ""
 
     prompt = f"""You are writing a YouTube Shorts script for Andrej to record on camera. This must sound like him talking — not like a script being read.
 
@@ -71,13 +78,13 @@ TOP YOUTUBE VIDEOS ON THIS TOPIC (for context on what's resonating):
 COMMUNITY RESEARCH (real pain points and language from Reddit, Quora, LinkedIn, Facebook groups):
 {forum_research}
 
-SCRIPT REQUIREMENTS:
+{hook_instruction}SCRIPT REQUIREMENTS:
 - Target length: 45–60 seconds when read aloud at a natural, unhurried pace. That is roughly 120–160 words.
 - The script must feel complete — not rushed. Each point needs a beat to land.
-- Hook: a hard truth, a real number, or a specific situation Andrej has seen. No questions. No "did you know". No "in today's world".
-- Body: 4–5 specific points. Each one should feel like something said mid-conversation — grounded in real patterns from 120+ education businesses. Name the mistake, explain why it happens, hint at the fix. Give enough detail that the viewer feels like they're getting real value, not a teaser.
+- Hook: {"use the WINNING HOOK provided above verbatim" if winning_hook else "a hard truth, a real number, or a specific situation Andrej has seen. No questions. No 'did you know'. No 'in today's world'."}
+- Body: 3–4 specific, actionable points. Mid-section must give the viewer something they can actually apply, check, or realise TODAY — not vague advice. Think: name the exact mistake, explain the real reason it happens (the one most people miss), and give the specific fix or thing to check. Be so specific that the viewer feels like Andrej just looked at their business.
 - Angle every topic toward ads and enrolments — even if the topic is about AI or time-saving, connect it back to how it affects their ability to get more students and tours.
-- Include one proof point naturally if it fits. Don't force it.
+- Include one real proof point naturally if it fits. Don't force it.
 - CTA: always the free ad review offer — vary the wording but the offer is always the same.
 
 Output the script in this exact format — nothing else:
