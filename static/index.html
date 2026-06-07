@@ -57,6 +57,11 @@
   .copy-btn.copied { border-color: #16a34a; color: #16a34a; background: #dcfce7; }
   .manual-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid #f0f0f0; }
   .manual-label { font-size: 11px; color: #bbb; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .btn-daily { background: #1a1a2e; margin-top: 0; font-size: 13px; padding: 9px 18px; }
+  .btn-daily:hover { background: #2d2d50; }
+  .daily-badge { font-size: 10px; background: #1a1a2e; color: #c4b5fd; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-left: 8px; vertical-align: middle; }
+  .winning-hook-box { background: #faf5ff; border: 2px solid #7c3aed; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: #3b0764; line-height: 1.5; }
+  .winning-hook-label { font-size: 10px; color: #7c3aed; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
 </style>
 </head>
 <body>
@@ -66,8 +71,12 @@
 </header>
 <div class="container">
   <div class="input-card">
-    <h2>What do you want to create today?</h2>
-    <textarea id="topicInput" placeholder="e.g. Why your education business ads aren't converting"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <h2 style="margin:0;">What do you want to create today?</h2>
+      <button class="btn btn-daily" onclick="generateDaily()" id="dailyBtn">&#9654; Generate Daily Script</button>
+    </div>
+    <div id="dailyTopicBanner" style="display:none;background:#f5f0ff;border:1px solid #c4b5fd;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#5b21b6;"></div>
+    <textarea id="topicInput" placeholder="e.g. Why your education business ads aren't converting — or click Generate Daily Script to auto-pick today's topic"></textarea>
     <div class="settings-toggle" onclick="toggleSettings()">
       <span id="settingsArrow">&#9658;</span> Agent Settings (optional)
     </div>
@@ -90,8 +99,8 @@
 </div>
 
 <script>
-const STEPS = ["Research", "Script"];
-const STATUS_STEPS = { queued: -1, researching: 0, scripting: 1, done: 2, error: -2 };
+const STEPS = ["Research", "Hooks", "Script"];
+const STATUS_STEPS = { queued: -1, researching: 0, hooks: 1, scripting: 2, done: 3, error: -2 };
 let jobs = {};
 let activeStreams = new Set();
 
@@ -116,6 +125,28 @@ async function submitJob() {
   jobs[job.id] = job;
   renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
   streamJob(data.job_id);
+}
+
+async function generateDaily() {
+  const btn = document.getElementById("dailyBtn");
+  btn.disabled = true;
+  btn.textContent = "Generating...";
+  try {
+    const res = await fetch("/daily", { method: "POST" });
+    const data = await res.json();
+    const banner = document.getElementById("dailyTopicBanner");
+    banner.style.display = "block";
+    banner.innerHTML = `<strong>Today's topic:</strong> ${escHtml(data.topic)}${data.already_exists ? " <em>(already generated today — scroll down)</em>" : ""}`;
+    if (!data.already_exists) {
+      const job = await (await fetch(`/jobs/${data.job_id}`)).json();
+      jobs[job.id] = job;
+      renderJobs(Object.values(jobs).sort((a,b) => b.created_at.localeCompare(a.created_at)));
+      streamJob(data.job_id);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "&#9654; Generate Daily Script";
+  }
 }
 
 function streamJob(jobId) {
@@ -195,9 +226,10 @@ function renderJob(job) {
   }).join("");
 
   let outputs = "";
-  if (job.status === "done" || job.thumbnail || job.description) {
+  if (job.status === "done" || job.thumbnail || job.description || job.script || job.hook_variants) {
     const tabs = [
       { key: "script", label: "Script", show: !!job.script },
+      { key: "hooks", label: "Hook Variants", show: !!job.hook_variants },
       { key: "thumbnail", label: "Thumbnail", show: !!job.thumbnail },
       { key: "description", label: "Description", show: !!job.description },
       { key: "research", label: "Research", show: !!job.research },
@@ -209,10 +241,21 @@ function renderJob(job) {
       `<div class="tab ${i === 0 ? 'active' : ''}" onclick="showTab(this,'${job.id}','${t.key}')">${t.label}</div>`
     ).join("");
 
+    const winningHookHtml = job.winning_hook ? `
+      <div class="winning-hook-box">
+        <div class="winning-hook-label">&#9733; Winning Hook</div>
+        ${escHtml(job.winning_hook)}
+      </div>` : "";
+
     const contentHtml = `
       <div id="tab-${job.id}-script" ${firstTab !== 'script' ? 'style="display:none"' : ''}>
+        ${winningHookHtml}
         <button class="copy-btn" onclick="copyText('script-text-${job.id}', this)">Copy</button>
         <div id="script-text-${job.id}" class="output-text">${escHtml(job.script || "")}</div>
+      </div>
+      <div id="tab-${job.id}-hooks" style="display:${job.hook_variants ? (firstTab === 'hooks' ? 'block' : 'none') : 'none'}">
+        <button class="copy-btn" onclick="copyText('hooks-text-${job.id}', this)">Copy</button>
+        <div id="hooks-text-${job.id}" class="output-text">${escHtml(job.hook_variants || "")}</div>
       </div>
       <div id="tab-${job.id}-thumbnail" style="display:${job.thumbnail ? (firstTab === 'thumbnail' ? 'block' : 'none') : 'none'}">
         <button class="copy-btn" onclick="copyText('thumb-text-${job.id}', this)">Copy</button>
@@ -246,8 +289,9 @@ function renderJob(job) {
       ${manualButtons}`;
   }
 
+  const dailyBadge = job.is_daily ? `<span class="daily-badge">Daily</span>` : "";
   return `<div class="job-card" id="job-${job.id}">
-    <div class="job-header"><div class="job-topic">${escHtml(job.topic)}</div><span class="badge ${badgeClass}">${badgeLabel}</span></div>
+    <div class="job-header"><div class="job-topic">${escHtml(job.topic)}${dailyBadge}</div><span class="badge ${badgeClass}">${badgeLabel}</span></div>
     <div class="progress">${steps}</div>
     <div class="job-meta">${date} &middot; ID: ${job.id}</div>
     ${outputs}
@@ -257,7 +301,7 @@ function renderJob(job) {
 function showTab(el, jobId, tab) {
   el.closest('.output-section').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['script','thumbnail','description','research'].forEach(t => {
+  ['script','hooks','thumbnail','description','research'].forEach(t => {
     const el = document.getElementById(`tab-${jobId}-${t}`);
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });

@@ -40,9 +40,22 @@ def init_db():
             research TEXT,
             youtube_data TEXT,
             script_context TEXT,
-            thumbnail_context TEXT
+            thumbnail_context TEXT,
+            hook_variants TEXT,
+            winning_hook TEXT,
+            is_daily INTEGER DEFAULT 0
         )
     """)
+    # migrate existing tables that lack the new columns
+    for col, definition in [
+        ("hook_variants", "TEXT"),
+        ("winning_hook", "TEXT"),
+        ("is_daily", "INTEGER DEFAULT 0"),
+    ]:
+        try:
+            con.execute(f"ALTER TABLE jobs ADD COLUMN {col} {definition}")
+        except Exception:
+            pass
     con.commit()
     con.close()
 
@@ -84,7 +97,7 @@ async def send_event(job_id: str, event: str, data: str):
 
 
 async def run_pipeline_async(job_id: str, topic: str, script_context: str = ""):
-    from agents import script_writer, youtube_research
+    from agents import hook_agent, script_writer, youtube_research
 
     try:
         await send_event(job_id, "progress", json.dumps({"step": 1, "msg": "Researching topic..."}))
@@ -94,11 +107,19 @@ async def run_pipeline_async(job_id: str, topic: str, script_context: str = ""):
         video_count = len(yt_data.get("videos", []))
         await send_event(job_id, "progress", json.dumps({"step": 1, "msg": f"Research done — {video_count} videos + community insights", "done": True}))
 
-        await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Writing script..."}))
+        await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Crafting hooks..."}))
+        db_update(job_id, status="hooks")
+        hook_data = await asyncio.to_thread(hook_agent.run, topic, yt_data.get("forum_research", ""))
+        db_update(job_id, hook_variants=hook_data["hook_variants"], winning_hook=hook_data["winning_hook"])
+        await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Best hook selected", "done": True}))
+
+        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Writing script..."}))
         db_update(job_id, status="scripting")
-        script_data = await asyncio.to_thread(script_writer.run, topic, yt_data, script_context)
+        script_data = await asyncio.to_thread(
+            script_writer.run, topic, yt_data, script_context, hook_data["winning_hook"]
+        )
         db_update(job_id, script=script_data["script"])
-        await send_event(job_id, "progress", json.dumps({"step": 2, "msg": "Script written", "done": True}))
+        await send_event(job_id, "progress", json.dumps({"step": 3, "msg": "Script written", "done": True}))
 
         db_update(job_id, status="done")
         await send_event(job_id, "done", json.dumps({"job_id": job_id}))
@@ -127,17 +148,57 @@ async def create_job(request: Request):
         return {"error": "topic required"}
     script_context = body.get("script_context", "")
     thumbnail_context = body.get("thumbnail_context", "")
+    is_daily = 1 if body.get("is_daily") else 0
     job_id = str(uuid.uuid4())[:8]
     con = sqlite3.connect(DB)
     con.execute(
-        "INSERT INTO jobs (id, topic, status, created_at, script_context, thumbnail_context) VALUES (?,?,?,?,?,?)",
-        (job_id, topic, "queued", datetime.now().isoformat(), script_context, thumbnail_context),
+        "INSERT INTO jobs (id, topic, status, created_at, script_context, thumbnail_context, is_daily) VALUES (?,?,?,?,?,?,?)",
+        (job_id, topic, "queued", datetime.now().isoformat(), script_context, thumbnail_context, is_daily),
     )
     con.commit()
     con.close()
     _queues[job_id] = asyncio.Queue()
     asyncio.create_task(run_pipeline_async(job_id, topic, script_context))
     return {"job_id": job_id}
+
+
+@app.post("/daily")
+async def generate_daily_script():
+    """Generate today's daily script from the topic bank."""
+    from agents.topic_bank import get_topic_for_today
+    topic = get_topic_for_today()
+    # Check if we already generated one for today
+    today_str = datetime.now().date().isoformat()
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    existing = con.execute(
+        "SELECT * FROM jobs WHERE is_daily=1 AND created_at LIKE ? ORDER BY created_at DESC LIMIT 1",
+        (f"{today_str}%",)
+    ).fetchone()
+    con.close()
+    if existing:
+        return {"job_id": existing["id"], "topic": existing["topic"], "already_exists": True}
+
+    job_id = str(uuid.uuid4())[:8]
+    con = sqlite3.connect(DB)
+    con.execute(
+        "INSERT INTO jobs (id, topic, status, created_at, script_context, thumbnail_context, is_daily) VALUES (?,?,?,?,?,?,?)",
+        (job_id, topic, "queued", datetime.now().isoformat(), "", "", 1),
+    )
+    con.commit()
+    con.close()
+    _queues[job_id] = asyncio.Queue()
+    asyncio.create_task(run_pipeline_async(job_id, topic))
+    return {"job_id": job_id, "topic": topic, "already_exists": False}
+
+
+@app.get("/topics")
+async def list_topics():
+    """Return all topics in the bank with today's topic highlighted."""
+    from agents.topic_bank import get_all_topics, get_topic_for_today
+    today_topic = get_topic_for_today()
+    topics = get_all_topics()
+    return {"today": today_topic, "topics": topics}
 
 
 @app.post("/jobs/{job_id}/thumbnail")
