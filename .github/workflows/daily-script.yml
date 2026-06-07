@@ -1,0 +1,62 @@
+name: Daily Script Generator
+
+on:
+  schedule:
+    # Runs at 7:00 AM Singapore time (UTC+8 = 23:00 UTC previous day)
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+    # Allows manual trigger from GitHub Actions tab — click "Run workflow"
+    inputs:
+      topic_override:
+        description: "Optional: override today's topic with a custom one"
+        required: false
+        default: ""
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install anthropic httpx python-dotenv
+
+      - name: Override topic (if provided)
+        if: ${{ github.event.inputs.topic_override != '' }}
+        run: |
+          python - <<'EOF'
+          import re, pathlib, textwrap
+          override = """${{ github.event.inputs.topic_override }}"""
+          path = pathlib.Path("agents/topic_bank.py")
+          src = path.read_text()
+          # Inject override at top of get_topic_for_today
+          src = re.sub(
+              r'(def get_topic_for_today\(\) -> str:\n\s+""".*?"""\n)',
+              r'\1    return ' + repr(override) + '\n    # --- override end ---\n    ',
+              src, flags=re.DOTALL
+          )
+          path.write_text(src)
+          EOF
+
+      - name: Generate daily script
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python generate_daily.py
+
+      - name: Commit script to repo
+        run: |
+          git config user.name "EduCreative Bot"
+          git config user.email "bot@socialfin.co"
+          git add scripts/
+          git diff --staged --quiet || git commit -m "Daily script: $(date +'%Y-%m-%d')"
+          git push
