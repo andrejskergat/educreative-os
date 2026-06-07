@@ -1,11 +1,11 @@
 import asyncio
 import logging
-import os
+import traceback
 from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
@@ -26,35 +26,49 @@ async def index():
 
 @app.post("/research")
 async def research(request: Request):
-    """Step 1 — research a topic and return 10 hooks to choose from."""
     from agents import hook_agent, youtube_research
     from agents.topic_bank import get_topic_for_today
 
-    body = await request.json()
-    topic = body.get("topic", "").strip() or get_topic_for_today()
+    try:
+        body = await request.json()
+        topic = body.get("topic", "").strip() or get_topic_for_today()
 
-    yt_data = await asyncio.to_thread(youtube_research.run, topic)
-    hook_data = await asyncio.to_thread(hook_agent.run, topic, yt_data.get("forum_research", ""))
+        yt_data = await asyncio.to_thread(youtube_research.run, topic)
+        hook_data = await asyncio.to_thread(hook_agent.run, topic, yt_data.get("forum_research", ""))
 
-    return {
-        "topic": topic,
-        "hooks": hook_data["hooks"],
-        "research_summary": yt_data.get("forum_research", ""),
-    }
+        return JSONResponse({
+            "topic": topic,
+            "hooks": hook_data["hooks"],
+        })
+    except Exception as e:
+        logger.error(traceback.format_exc())
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
 @app.post("/write")
 async def write(request: Request):
-    """Step 2 — write a script around the chosen hook."""
     from agents import script_writer, youtube_research
 
-    body = await request.json()
-    topic = body.get("topic", "").strip()
-    hook = body.get("hook", "").strip()
-    if not topic or not hook:
-        return {"error": "topic and hook required"}
+    try:
+        body = await request.json()
+        topic = body.get("topic", "").strip()
+        hook = body.get("hook", "").strip()
+        if not topic or not hook:
+            return JSONResponse({"error": "topic and hook required"}, status_code=400)
 
-    yt_data = await asyncio.to_thread(youtube_research.run, topic)
-    script_data = await asyncio.to_thread(script_writer.run, topic, yt_data, winning_hook=hook)
+        yt_data = await asyncio.to_thread(youtube_research.run, topic)
+        script_data = await asyncio.to_thread(script_writer.run, topic, yt_data, winning_hook=hook)
 
-    return {"script": script_data["script"]}
+        return JSONResponse({"script": script_data["script"]})
+    except Exception as e:
+        logger.error(traceback.format_exc())
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.get("/topics")
+async def topics():
+    try:
+        from agents.topic_bank import get_topic_for_today
+        return JSONResponse({"today": get_topic_for_today()})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
